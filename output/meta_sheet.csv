@@ -1,0 +1,18 @@
+sdg,indicatorname,indicatorshort,indicator_wdi,indicator,indicator_sdg,min,max,more_is_better,target_value,start_prog_eval,end_prog_eval,granularity,support,extreme_percentile,unit
+1,Poverty headcount ratio at $2.15 a day (2017 PPP) (% of population),Extreme poverty rate,SI.POV.DDAY,SI.POV.DDAY,1.1.1,0,100,0,3,2015,2025,0.01,1,"c(0.02, 0.02)",% of population
+2,Prevalence of undernourishment (% of population),Undernourishment rate,SN.ITK.DEFC.ZS,SN.ITK.DEFC.ZS,2.1.1,NULL,NULL,0,2.5,2015,2022,0.1,1,"c(0.02, 0.02)",% of population
+3,"Maternal mortality ratio (modeled estimate, per 100,000 live births)",Maternal mortality rate,SH.STA.MMRT,SH.STA.MMRT,3.1.1,NULL,NULL,0,70,2015,2023,0.1,1,"c(0.02, 0.02)","per 100,000 live births"
+4,"Primary completion rate, total (% of relevant age group)",Primary school completion rate,SE.PRM.CMPT.ZS,SE.PRM.CMPT.ZS,4.1.2,NULL,NULL,1,100,2015,2023,0.1,1,"c(0.02, 0.02)",% of relevant age group
+5,"Labor force participation rate, female (% of female population ages 15-64) (modeled ILO estimate)",Female labor force participation rate,SL.TLF.ACTI.FE.ZS,SL.TLF.ACTI.FE.ZS,8.5.1,NULL,NULL,1,80,2015,2024,0.1,1,"c(0.02, 0.02)",% of female population ages 15-64
+6,People using safely managed drinking water services (% of population),Access to safe drinking water,SH.H2O.SMDW.ZS,SH.H2O.SMDW.ZS,6.1.1,NULL,NULL,1,99,2015,2022,0.1,1,"c(0.02, 0.02)",% of population
+7,Access to electricity (% of population),Access to electricity,EG.ELC.ACCS.ZS,EG.ELC.ACCS.ZS,7.1.1,NULL,NULL,1,99,2015,2023,0.1,1,"c(0.02, 0.02)",% of population
+8,GDP per capita (constant 2015 US$),GDP per capita,NY.GDP.PCAP.KD,NY.GDP.PCAP.KD,8.1.1,122.6789,89884.08,1,93850,2015,2022,0.6,3,"c(0.05, 0.05)",US$ per capita
+9,Individuals using the Internet (% of population),Individuals using the Internet,IT.NET.USER.ZS,IT.NET.USER.ZS,17.8.1,NULL,NULL,1,95,2015,2024,0.1,1,"c(0.02, 0.02)",% of population
+10,Prosperity gap (average shortfall from a prosperity standard of $25/day),Prosperity gap,SI.SPR.PGAP,SI.SPR.PGAP,10.1.1,0,NULL,0,0.5,2015,2023,0.1,1,"c(0.02, 0.02)",gap from prosperity standard
+11,,,NA,NA,,,,,,,,,,,
+12,Fossil fuel subsidy (% of GDP),Fossil fuel subsidy,FF.SUB.GDP.ZS,FF.SUB.GDP.ZS,12.c.1,,,0,0,,,,,,% of GDP
+13,Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita),Total greehouse gases per capita,NA,EN.GHG.ALL.PC.CE.AR5,13.2.2,,,0,0,2015,2023,0.1,1,"c(0.02, 0.02)",t CO2e/capita
+14,"Chlorophyll-a deviations, remote sensing (%)",,NA,EN_MAR_CHLDEV,14.1.1,,,0,0,,,,,,
+15,Terrestrial protected areas (% of total land area),Terrestrial protected areas,NA,ER.LND.PTLD.ZS,15.1.2,,,1,30,,,,,,% of total land area
+16,,,NA,NA,,,,,,,,,,,
+17,Statistical performance indicators (SPI): Overall score (scale 0-100),Statistical performance score (0-100),IQ.SPI.OVRL,IQ.SPI.OVRL,17.18.1,0,NULL,1,100,2016,2023,0.1,1,"c(0.02, 0.02)",overall score
