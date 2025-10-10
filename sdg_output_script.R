@@ -34,6 +34,7 @@ meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 202
 # Example: SDG 2 ####
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Input data __________ #
+#indicator_wdi <- "SN.ITK.DEFC.ZS"
 data_wdi <- wbstats::wb_data(indicator = indicator_wdi,
                              lang      = "en",
                              country   = "countries_only")
@@ -48,7 +49,7 @@ best           <- meta_indicator$best
 indicatorname  <- meta_indicator$indicatorname
 indicator_sdg  <- meta_indicator$indicator_sdg
 startyear_data <- 1950
-endyear_data   <- 2025
+endyear_data   <- meta_indicator$end_prog_eval
 
 # Track progress  _____ ####
 progress_results <-  suppressWarnings(
@@ -82,7 +83,7 @@ progress_results <-  suppressWarnings(
 ## some outputs ------- ####
 path_speed  <- progress_results$predicted_changes$path_speed
 score_speed <- progress_results$scores$speed
-
+typical_value <- progress_results$path_historical$speed
 
 # Fromatting the data
 data_wdi <- data_wdi |>
@@ -140,14 +141,22 @@ year_target <- path_speed |>
   select(time) |>
   as.numeric()
 
+# keep only the typical end value for each country for the indicator
+typical_value <- typical_value |>
+  group_by(code) |>
+  filter(speed == 1,
+         year == max(year)) |>
+  select(code, y_speed)
+  
 # Prepare speed data
 dashboard_speed <- progress_results$scores$speed |>
   rename("start_year"        = "year_start",
          "end_year"          = "year",
          "end_value"         = "y_end",
          "start_value"       = "y",
-         "speed"             = "score",
-         "typical_end_value" = "y_speed") |>
+         "speed"             = "score"
+#         "typical_end_value" = "y_speed"
+          ) |>
   mutate(speed = if_else(start_value < target & best=="low" & !is.na(target),
                          NA,
                          speed),
@@ -161,7 +170,10 @@ dashboard_speed <- progress_results$scores$speed |>
                                            reach_target_year))) |>
   select(-evaluationperiod,
          -time_end,
-         -time_start)
+         -time_start,
+         -y_speed) |>
+  merge(typical_value, by = "code") |>
+  rename("typical_end_value" = "y_speed")
 
 # Merge all
 dashboard <- data_wdi |>
