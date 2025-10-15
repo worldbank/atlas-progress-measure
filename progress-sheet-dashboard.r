@@ -29,13 +29,13 @@ for (indicator_wdi in indicators[c(2:7, 9, 12)]) {
   }
 
 ### Merge in SDG 1, 8, and 10 data
-sdg1 <- read_excel("dashboard_output_SDG1.xlsx", sheet = 1)
+sdg1 <- read_excel("new_dashboard_output_SDG1.xlsx", sheet = 1)
 sdg8 <- read_excel("dashboard_output_SDG8.xlsx", sheet = 1)
 sdg10 <- read_excel("dashboard_output_SDG10.xlsx", sheet = 1)
 
 dashboard1810 <- sdg1 |>
   rbind(sdg8, sdg10) |>
-  select(-c("reach_target", "pctl"))
+  select(-c("pctl"))
 
 dashboard_final <- dashboard_final |>
   rbind(dashboard1810) |>

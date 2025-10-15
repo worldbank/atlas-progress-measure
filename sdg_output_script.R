@@ -34,7 +34,7 @@ meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 202
 # Example: SDG 2 ####
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Input data __________ #
-#indicator_wdi <- "SN.ITK.DEFC.ZS"
+#indicator_wdi <- "SH.UHC.SRVS.CV.XD"
 data_wdi <- wbstats::wb_data(indicator = indicator_wdi,
                              lang      = "en",
                              country   = "countries_only")
