@@ -75,10 +75,54 @@ data_agg <- wbstats::wb_data(indicator = dashboard_indicators$indicator,
          code = ifelse(country == "Lower middle income", "LMC", code),
          code = ifelse(country == "Upper middle income", "UMC", code))
 
+# Load SDG 1 data from input folder
+d1reg  <- read.csv("input/poverty-region.csv") %>%
+  mutate(iso3c = ifelse(region == "East Asia & Pacific", "EAS",
+                        ifelse(region == "Europe & Central Asia", "ECS",
+                               ifelse(region == "Latin America & Caribbean", "LCN",
+                                      ifelse(region == "Middle East, North Africa, Afghanistan & Pakistan", "MEA",
+                                             ifelse(region == "North America", "NAC",
+                                                    ifelse(region == "South Asia", "SAS",
+                                                           ifelse(region == "Sub-Saharan Africa", "SSF", NA
+                                                                  )))))))) %>%
+  select(iso3c, year, rate)
+
+d1inc <- read.csv("input/poverty-incgroup.csv") %>%
+  mutate(iso3c = ifelse(incgroup == "High income", "HIC",
+                        ifelse(incgroup == "Upper middle income", "UMC",
+                               ifelse(incgroup == "Lower middle income", "LMC",
+                                      ifelse(incgroup == "Low income", "LIC", NA
+                                             ))))) %>%
+  select(iso3c, year, rate)
+                        
+d1 <- read.csv("input/poverty-global.csv") %>%
+  mutate(iso3c = "WLD") %>%
+  select(iso3c, year, rate) %>%
+  rbind(d1reg, d1inc) %>%
+  rename(value = rate) %>%
+  mutate(variable = "SI.POV.DDAY")
+
+# Load SDG 12 data from input folder
+d12 <- read_excel("input/fossil_fuel_subsidy_global.xlsx", sheet = 1) %>%
+  rename(value = `Fossil fuel subsidy (% of GDP)`,
+         iso3c = region_code) %>%
+  mutate(variable = "FF.SUB.GDP.ZS") %>%
+  select(iso3c, year, value, variable)
+
+# Load SDG 14 data from UNSDG website
+d14 <- jsonlite::fromJSON(paste('https://unstats.un.org/SDGAPI/v1/sdg/Series/Data?seriesCode=EN_MAR_CHLDEV&pageSize=10000',sep=""), flatten = TRUE)$data %>%
+  as_tibble() %>%
+  filter(str_detect(geoAreaName, "World")) %>%
+  select(series, timePeriodStart, value) %>%
+  mutate(iso3c = "WLD") %>%
+  rename(year = timePeriodStart,
+         variable = series)
+
 values_agg <- data_agg %>%
   select(-iso2c, -country) %>%
   melt(id.vars = c("code", "year")) %>%
-  rename(iso3c = code) 
+  rename(iso3c = code) %>%
+  rbind(d14, d1, d12)
 
 values_agg <- values_agg %>%
   merge(meta, by.x = "variable", 
@@ -90,5 +134,3 @@ values_agg <- values_agg %>%
   
 write.csv(values_agg, "output/values_agg_sheet.csv", row.names = FALSE)
 
-# Calculate aggregates for SDG 1, 12 and 14
-# TBD
