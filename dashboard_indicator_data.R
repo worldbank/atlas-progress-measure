@@ -27,21 +27,21 @@ values <- data_wdi %>%
   rename(iso3c = code) 
 
 # Load and process data for SDG 1
-poverty <- read.csv("poverty-country.csv") %>%
+poverty <- read.csv("input/poverty-country.csv") %>%
   rename(iso3c = code,
          value = rate
          ) %>%
   mutate(variable = "SI.POV.DDAY")
 
 # Load and process data for SDG 12
-subsidy <- read_excel("Fossil Fuel Subsidy Map.xlsx", sheet = 1) %>%
+subsidy <- read_excel("input/Fossil Fuel Subsidy Map.xlsx", sheet = 1) %>%
   select(-c("countryname", "region", "incomelevel")) %>%
   melt(idvars = "iso3c") %>%
   rename(year = variable) %>%
   mutate(variable = "FF.SUB.GDP.ZS")
 
 # Load and process data for SDG 14
-chloro <- read.csv("goal-14-input.csv") %>%
+chloro <- read.csv("input/goal-14-input.csv") %>%
   select(ISO3Code, TimePeriod, Value, ) %>%
   rename(iso3c = ISO3Code,
          year = TimePeriod,
