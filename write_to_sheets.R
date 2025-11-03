@@ -1,6 +1,7 @@
 rm(list=ls())
 library(googlesheets4)
 library(tidyr)
+library(dplyr)
 
 source("progress-sheet-dashboard.R")
 source("dashboard_indicator_data.R")
