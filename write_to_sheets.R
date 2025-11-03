@@ -1,4 +1,9 @@
+rm(list=ls())
 library(googlesheets4)
+
+source("progress-sheet-dashboard.R")
+source("dashboard_indicator_data.R")
+source("extend_meta_with_data.R")
 
 values <- read.csv('output/values_sheet.csv')
 write_sheet(values, ss = '14kDeXh0H6vjzldndSBN4p67CCNANHdm7EmqnwojcKh0', sheet = 'values')
