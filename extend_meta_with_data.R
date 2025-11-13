@@ -68,12 +68,16 @@ all_indicator_data <- rbind(indicators, extents_values_diffs) |>
 
 meta <- read.csv('output/meta_sheet.csv')
 
+# Add pillars mapping
+mapping <- read.csv("input/goals-pillars-mapping.csv")
+
 # Number of countries that reached the target
 reached.target <- left_join(prog, meta, by = "indicator_sdg") |>
   group_by(indicator_sdg) |>
   summarise(reached_target = sum(if_else(more_is_better == 1, end_value >= target_value, end_value <= target_value)))
 
 meta.extended <- left_join(meta, all_indicator_data, by = 'indicator_sdg') |>
-  left_join(reached.target, by = 'indicator_sdg')
+  left_join(reached.target, by = 'indicator_sdg') |>
+  left_join(mapping, by = "sdg")
 
 write.csv(meta.extended, file = 'output/meta_extended_sheet.csv', row.names = FALSE)
