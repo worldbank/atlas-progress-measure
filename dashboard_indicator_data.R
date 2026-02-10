@@ -50,13 +50,15 @@ subsidy <- read_excel("input/Fossil Fuel Subsidy Map.xlsx", sheet = 1) %>%
   rename(year = variable) %>%
   mutate(variable = "FF.SUB.GDP.ZS")
 
-# Load and process data for SDG 14
+# Load and process data for SDG 14, filter out non-WB economies
+cntries <- wbstats::wb_countries() |> filter(region != "Aggregates")
 chloro <- read.csv("input/goal-14-input.csv") %>%
   select(ISO3Code, TimePeriod, Value, ) %>%
   rename(iso3c = ISO3Code,
          year = TimePeriod,
          value = Value) %>%
-  mutate(variable = "EN_MAR_CHLDEV")
+  mutate(variable = "EN_MAR_CHLDEV") %>%
+  filter(iso3c %in% cntries$iso3c)
 
 # Load and process data for AI chapter
 ai <- read.csv("input/chatgpt.csv") %>%

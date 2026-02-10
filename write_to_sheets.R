@@ -1,5 +1,7 @@
 rm(list=ls())
 library(googlesheets4)
+library(tidyr)
+library(dplyr)
 
 source("progress-sheet-dashboard.R")
 source("dashboard_indicator_data.R")
@@ -14,8 +16,22 @@ write_sheet(agg, ss = '14kDeXh0H6vjzldndSBN4p67CCNANHdm7EmqnwojcKh0', sheet = 'a
 progress <- read.csv('output/progress_sheet.csv')
 write_sheet(progress, ss = '14kDeXh0H6vjzldndSBN4p67CCNANHdm7EmqnwojcKh0', sheet = 'progress')
 
-meta <- read.csv('output/meta_sheet.csv')
-write_sheet(meta, ss = '14kDeXh0H6vjzldndSBN4p67CCNANHdm7EmqnwojcKh0', sheet = 'meta')
+#meta <- read.csv('output/meta_sheet.csv')
+#write_sheet(meta, ss = '14kDeXh0H6vjzldndSBN4p67CCNANHdm7EmqnwojcKh0', sheet = 'meta')
 
 meta.extended <- read.csv('output/meta_extended_sheet.csv')
 write_sheet(meta.extended, ss = '14kDeXh0H6vjzldndSBN4p67CCNANHdm7EmqnwojcKh0', sheet = 'meta_extended')
+
+# Indicator names and units for translations
+to.translate <- select(meta.extended, indicator_sdg, indicator = indicatorname, indicator.short = indicatorshort, indicator.unit = unit)
+
+to.translate.long <-  pivot_longer(to.translate,
+    cols = 2:4,
+    names_to = "key",
+    values_to = "en"
+  ) |>
+  mutate(key = paste0(key, ".", indicator_sdg)) |>
+  select(-indicator_sdg) |>
+  mutate(es = NA, fr = NA, ar = NA, zh = NA, ja = NA)
+
+write_sheet(to.translate.long, ss = '1KC-m96OtQx63iZMwf4q_dSc7oZ8gtpmkC-no7SChgco', sheet = "indicators.i18n")
