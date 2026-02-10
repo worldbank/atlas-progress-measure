@@ -17,7 +17,7 @@ library(trackr)
 library(collapse)
 library(readxl)
 library(dplyr)
-
+library(haven)
 
 ## !! NOTE: Add your own path ####
 meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/output/meta_sheet.csv") |>
@@ -26,54 +26,55 @@ meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 202
                   "high",
                   "low")
   ) %>%
-  rename(indicator_select = indicator_wdi)
+  rename(indicator_select = indicator_wdi) 
+
 ## Make sure you have the latest version installed ####
-# devtools::install_github("RossanaTat/trackr@DEV")
+#devtools::install_github("RossanaTat/trackr")
+setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Example: SDG 2 ####
+# Life expectancy ####
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Input data __________ #
-#indicator_wdi <- "SL.TLF.ACTI.FE.ZS"
-data_wdi <- wbstats::wb_data(indicator = indicator_wdi,
-                             lang      = "en",
-                             country   = "countries_only")
-
+indicator_wdi <- "ELEC_SUP_PC"
+load("input/electricity.Rda")
+load("input/parameters.Rda")
+data_wdi <- electricity %>%
+  select(year, code, electricity)
 
 # Params from wdi metadata  ----- #
 # Change depending on which SDG, this example is SDG 2
 meta_indicator <- meta %>%
-  filter(indicator_select == indicator_wdi)
-target         <- meta_indicator$target_value
+  filter(indicator == indicator_wdi)
+target         <- 10
 best           <- meta_indicator$best
 indicatorname  <- meta_indicator$indicatorname
 indicator_sdg  <- meta_indicator$indicator_sdg
 startyear_data <- 1950
-endyear_data   <- meta_indicator$end_prog_eval
+endyear_data   <- as.numeric(meta_indicator$end_prog_eval)
 
 # Track progress  _____ ####
-progress_results <-  suppressWarnings(
-  trackr::track_progress(
+progress_results <- trackr::track_progress(
   data           = data_wdi,
-  indicator      = indicator_wdi,
-  code_col       = "iso3c",
-  year_col       = "date",
+  indicator      = "electricity",
+  code_col       = "code",
+  year_col       = "year",
   startyear_data = startyear_data,
   endyear_data   = endyear_data,
   eval_from      = meta_indicator$start_prog_eval,
   eval_to        = meta_indicator$end_prog_eval,
   future         = TRUE,
-  target_year    = 2150,
+  target_year    = 2030,
   speed          = TRUE,
-  percentiles    = TRUE,
+  percentiles    = FALSE,
   sequence_pctl  = seq(20, 80, 20),
   sequence_speed = c(0.25, 0.5, 1, 2, 4),
   best           = best,
-#  min            = meta_indicator$min,
-#  max            = meta_indicator$max,
+  #  min            = meta_indicator$min,
+  #  max            = meta_indicator$max,
   support        = meta_indicator$support,
-  granularity    = meta_indicator$granularity
-))
+  granularity    = 0.01
+)
 
 
 #track_progress## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -85,22 +86,12 @@ path_speed  <- progress_results$predicted_changes$path_speed
 score_speed <- progress_results$scores$speed
 typical_value <- progress_results$path_historical$speed
 
-future <- progress_results$path_future$speed
-
 # Fromatting the data
-data_wdi <- data_wdi |>
-  frename(
-    c(year = "date", code = "iso3c", y = indicator_wdi),
-    .nse = FALSE
-  ) |>
-  # Only keep relevant columns
-  fselect(year,
-          code,
-          y) |>
-  fmutate(target = target,
-          best   = best)
-
-
+data_wdi <- data_wdi %>%
+  rename(y = electricity) %>%
+  select(year, code, y) %>%
+  mutate(target = target,
+         best = best)
 
 # Prepare data on when target was reached
 
@@ -118,7 +109,7 @@ if (!is.na(target)) {
              year) |>
       rename("reach_target_year" = "year")
   }
-
+  
   if (best=="high") {
     targetreachpast <- data_wdi |>
       filter(!is.na(y)) |>
@@ -149,7 +140,7 @@ typical_value <- typical_value |>
   filter(speed == 1,
          year == max(year)) |>
   select(code, y_speed)
-  
+
 # Prepare speed data
 dashboard_speed <- progress_results$scores$speed |>
   rename("start_year"        = "year_start",
@@ -157,8 +148,8 @@ dashboard_speed <- progress_results$scores$speed |>
          "end_value"         = "y_end",
          "start_value"       = "y",
          "speed"             = "score"
-#         "typical_end_value" = "y_speed"
-          ) |>
+         #         "typical_end_value" = "y_speed"
+  ) |>
   mutate(speed = if_else(start_value < target & best=="low" & !is.na(target),
                          NA,
                          speed),
@@ -225,12 +216,13 @@ dashboard <- data_wdi |>
              verbose        = FALSE) |>
   rename("pctl"  = "score") |>
   mutate(pctl    = if_else(is.na(speed),
-                        NA,
-                        pctl))
+                           NA,
+                           pctl))
 
 
 dashboard <- dashboard[,c(8,6,7,4,5,2,14,13,1,3,11,10,9,12,15)]
 
+writexl::write_xlsx(dashboard, "dashboard_output_electricity.xlsx")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Export to Excel ####
