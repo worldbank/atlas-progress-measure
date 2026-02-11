@@ -2,10 +2,9 @@ rm(list=ls())
 
 library(dplyr)
 library(quantregGrowth)
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
 #source("dashboard_indicator_data.R")
 
-meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/output/meta_sheet.csv") |>
+meta <- read.csv("output/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
@@ -28,8 +27,7 @@ for (indicator_wdi in wdind) {
   df <- get("dashboard", envir = env)
 
   dashboard_final <- rbind(dashboard_final, df)
-  
-  }
+}
 
 ### Merge in SDG 1, 4, 8, and 10 data
 sdg1 <- read_excel("new_dashboard_output_SDG1.xlsx", sheet = 1)

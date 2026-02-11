@@ -1,45 +1,34 @@
-
-# ____________________________ #
-# SAMPLE WORKFLOW  ####
-# ____________________________ #
-
-# This script demonstrates how to:
-# 1. Retrieve indicator data from WDI
-# 2. Run the full model using {trackr} and optionally export results to Excel
-# 3. Apply additional formatting steps to prepare the output for the SDG dashboard and export to Excel
-
-# Preliminary operations
-#rm(list=ls())
+# Error: input/EYS_data_update_2025 2.dta file does not exist in repo
+# Replaced by progress-sdg04-years-schooling.R?
 
 # Import packages & metadata
 rm(list=ls())
-library(trackr)
+
 library(collapse)
 library(readxl)
 library(dplyr)
 library(haven)
+## Make sure you have the latest version installed ####
+# devtools::install_github("RossanaTat/trackr@DEV")
+library(trackr)
 
 ## !! NOTE: Add your own path ####
-meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/output/meta_sheet.csv") |>
+meta <- read.csv("output/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
                   "low")
-  ) %>%
+  ) |>
   rename(indicator_select = indicator_wdi)
 
-## Make sure you have the latest version installed ####
-#devtools::install_github("RossanaTat/trackr")
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Life expectancy ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Input data __________ #
-indicator_wdi <- "lifeexpectancy"
-load("input/lifeexpectancy.Rda")
-data_wdi <- lifeexpectancy %>%
-  select(-source)
+indicator_wdi <- "HCI_EYRS"
+data_wdi <- read_dta("input/EYS_data_update_2025 2.dta") %>%
+  rename(iso3c = wbcode,
+         HCI_EYRS = eys_mf_fill,
+         date = year) %>%
+  select(iso3c, date, HCI_EYRS)
+
 # Params from wdi metadata  ----- #
 # Change depending on which SDG, this example is SDG 2
 meta_indicator <- meta %>%
@@ -48,15 +37,16 @@ target         <- meta_indicator$target_value
 best           <- meta_indicator$best
 indicatorname  <- meta_indicator$indicatorname
 indicator_sdg  <- meta_indicator$indicator_sdg
-startyear_data <- 1950
-endyear_data   <- as.numeric(meta_indicator$end_prog_eval)
+startyear_data <- 2001
+endyear_data   <- meta_indicator$end_prog_eval
 
 # Track progress  _____ ####
-progress_results <- trackr::track_progress(
+progress_results <-  suppressWarnings(
+  trackr::track_progress(
     data           = data_wdi,
-    indicator      = "lifeexpectancy",
-    code_col       = "code",
-    year_col       = "year",
+    indicator      = indicator_wdi,
+    code_col       = "iso3c",
+    year_col       = "date",
     startyear_data = startyear_data,
     endyear_data   = endyear_data,
     eval_from      = meta_indicator$start_prog_eval,
@@ -72,7 +62,7 @@ progress_results <- trackr::track_progress(
     #  max            = meta_indicator$max,
     support        = meta_indicator$support,
     granularity    = meta_indicator$granularity
-  )
+  ))
 
 
 #track_progress## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -85,11 +75,19 @@ score_speed <- progress_results$scores$speed
 typical_value <- progress_results$path_historical$speed
 
 # Fromatting the data
-data_wdi <- data_wdi %>%
-  rename(y = lifeexpectancy) %>%
-  select(year, code, y) %>%
-  mutate(target = target,
-         best = best)
+data_wdi <- data_wdi |>
+  frename(
+    c(year = "date", code = "iso3c", y = indicator_wdi),
+    .nse = FALSE
+  ) |>
+  # Only keep relevant columns
+  fselect(year,
+          code,
+          y) |>
+  fmutate(target = target,
+          best   = best)
+
+
 
 # Prepare data on when target was reached
 
@@ -220,21 +218,6 @@ dashboard <- data_wdi |>
 
 dashboard <- dashboard[,c(8,6,7,4,5,2,14,13,1,3,11,10,9,12,15)]
 
-writexl::write_xlsx(dashboard, "dashboard_output_lifeexpectancy.xlsx")
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Export to Excel ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
-## !! NOTE: Add your own path ####
-
-
-### Progress results -output of {trackr} ####
-#trackr::export_results_to_excel(res_list  = progress_results,
-#                                file_path = "P:\\02.personal\\wb621604\\trackr_testing\\progress_results.xlsx")
-
-
-### Dashboard Data ####
-#writexl::write_xlsx(dashboard, "P:\\02.personal\\wb621604\\trackr_testing\\dashboard_output.xlsx")
+writexl::write_xlsx(dashboard, "intermediate/dashboard_output_SDG4.xlsx")
 
 

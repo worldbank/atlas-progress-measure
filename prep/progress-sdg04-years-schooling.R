@@ -1,62 +1,49 @@
-
-# ____________________________ #
-# SAMPLE WORKFLOW  ####
-# ____________________________ #
-
-# This script demonstrates how to:
-# 1. Retrieve indicator data from WDI
-# 2. Run the full model using {trackr} and optionally export results to Excel
-# 3. Apply additional formatting steps to prepare the output for the SDG dashboard and export to Excel
-
-# Preliminary operations
-#rm(list=ls())
+## Calculate progress in years of schooling
+## Write results to intermediate Excel file
+## track_progress() errors
 
 # Import packages & metadata
 rm(list=ls())
-library(trackr)
 library(collapse)
 library(readxl)
 library(dplyr)
+library(tidyr)
 library(haven)
+## Make sure you have the latest version installed ####
+#devtools::install_github("RossanaTat/trackr")
+library(trackr)
 
-## !! NOTE: Add your own path ####
-meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/output/meta_sheet.csv") |>
+meta <- read.csv("output/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
                   "low")
-  ) %>%
-  rename(indicator_select = indicator_wdi) 
+  ) |>
+  dplyr::rename(indicator_select = indicator_wdi) 
 
-## Make sure you have the latest version installed ####
-#devtools::install_github("RossanaTat/trackr")
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
+# Input data
+indicator_wdi <- "SCH_YRS"
+load("input/education.Rda")
+data_wdi <- education %>%
+  pivot_wider(names_from = source, values_from = education) %>%
+  mutate(education = ifelse(is.na(`1`), `2`, `1`)) %>%
+  select(year, code, education) %>% 
+  distinct(year, code, .keep_all = TRUE)
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Life expectancy ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Input data __________ #
-indicator_wdi <- "ELEC_SUP_PC"
-load("input/electricity.Rda")
-load("input/parameters.Rda")
-data_wdi <- electricity %>%
-  select(year, code, electricity)
-
-# Params from wdi metadata  ----- #
-# Change depending on which SDG, this example is SDG 2
+# Params from wdi metadata
 meta_indicator <- meta %>%
   filter(indicator == indicator_wdi)
-target         <- 10
+target         <- meta_indicator$target_value
 best           <- meta_indicator$best
 indicatorname  <- meta_indicator$indicatorname
 indicator_sdg  <- meta_indicator$indicator_sdg
 startyear_data <- 1950
 endyear_data   <- as.numeric(meta_indicator$end_prog_eval)
 
-# Track progress  _____ ####
+# Track progress
 progress_results <- trackr::track_progress(
   data           = data_wdi,
-  indicator      = "electricity",
+  indicator      = "education",
   code_col       = "code",
   year_col       = "year",
   startyear_data = startyear_data,
@@ -73,22 +60,18 @@ progress_results <- trackr::track_progress(
   #  min            = meta_indicator$min,
   #  max            = meta_indicator$max,
   support        = meta_indicator$support,
-  granularity    = 0.01
+  granularity    = meta_indicator$granularity
 )
 
-
-#track_progress## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Prepare data for SDG dashboard ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
-## some outputs ------- ####
+# Prepare data for SDG dashboard
+## some outputs
 path_speed  <- progress_results$predicted_changes$path_speed
 score_speed <- progress_results$scores$speed
 typical_value <- progress_results$path_historical$speed
 
-# Fromatting the data
+# Formatting the data
 data_wdi <- data_wdi %>%
-  rename(y = electricity) %>%
+  rename(y = education) %>%
   select(year, code, y) %>%
   mutate(target = target,
          best = best)
@@ -134,7 +117,7 @@ year_target <- path_speed |>
   select(time) |>
   as.numeric()
 
-# keep only the typical end value for each country for the indicator
+# Keep only the typical end value for each country for the indicator
 typical_value <- typical_value |>
   group_by(code) |>
   filter(speed == 1,
@@ -222,21 +205,5 @@ dashboard <- data_wdi |>
 
 dashboard <- dashboard[,c(8,6,7,4,5,2,14,13,1,3,11,10,9,12,15)]
 
-writexl::write_xlsx(dashboard, "dashboard_output_electricity.xlsx")
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Export to Excel ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
-## !! NOTE: Add your own path ####
-
-
-### Progress results -output of {trackr} ####
-#trackr::export_results_to_excel(res_list  = progress_results,
-#                                file_path = "P:\\02.personal\\wb621604\\trackr_testing\\progress_results.xlsx")
-
-
-### Dashboard Data ####
-#writexl::write_xlsx(dashboard, "P:\\02.personal\\wb621604\\trackr_testing\\dashboard_output.xlsx")
-
+writexl::write_xlsx(dashboard, "intermediate/dashboard_output_education.xlsx")
 

@@ -1,16 +1,16 @@
+# Collect all indicator value data
+
 rm(list=ls())
 library(tidyverse)
-library(reshape2)
+#library(reshape2)
 library(quantregGrowth)
 library(wbstats)
 library(readxl)
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
 #load("poverty.Rda")
 #load("ghggdp.Rda")
 
 # read other data
 meta <- read.csv("output/meta_sheet.csv") 
-progress <- read.csv("output/progress_sheet.csv")
 
 # Dashboard indicators list
 wdind <- c("SN.ITK.DEFC.ZS", "SL.TLF.ACTI.FE.ZS", "SH.H2O.SMDW.ZS",
@@ -20,9 +20,13 @@ wdind <- c("SN.ITK.DEFC.ZS", "SL.TLF.ACTI.FE.ZS", "SH.H2O.SMDW.ZS",
            "SH.DYN.MORT", "SH.DYN.NMRT", "SH.STA.MMRT")
 
 # Load and process data from WDI for SDG 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 17
-data_wdi <- wbstats::wb_data(indicator = wdind,
-                             country="countries_only") |>
-  rename("year" = "date","code" = "iso3c") 
+# Split into batches to avoid timeout
+batch1 <- wbstats::wb_data(indicator = wdind[1:7], country="countries_only")
+Sys.sleep(2)
+batch2 <- wbstats::wb_data(indicator = wdind[8:14], country="countries_only")
+
+data_wdi <- full_join(batch1, batch2, by = c('iso2c', 'iso3c', 'country', 'date')) |>
+  rename("year" = "date", "code" = "iso3c")
 
 values <- data_wdi %>%
   select(-iso2c, -country) %>%

@@ -1,3 +1,6 @@
+# Get food insecurity data from Microdata API
+# Writesdg2-food-insecurity.csv csv file to input folder (but this file is nowhere used)
+
 # Load necessary packages
 library(httr2)
 library(jsonlite)
@@ -7,11 +10,11 @@ library(dplyr)
 BASE_URL <- "https://microdata.worldbank.org/index.php/api/tables/data/fcv/wfso"
 PAGE_LIMIT <- 1000 # Maximum number of rows to retrieve per request
 
-# --- 1. Define the Initial Request Object ---
+# Define the Initial Request Object
 base_req <- request(BASE_URL) %>%
   req_url_query(limit = PAGE_LIMIT, offset = 0)
 
-# --- 2. Perform the Iterative Request (WITHOUT the 'total' argument) ---
+# Perform the Iterative Request (WITHOUT the 'total' argument)
 # The iteration will now run until the API returns an empty response.
 
 all_responses <- req_perform_iterative(
@@ -27,7 +30,7 @@ all_responses <- req_perform_iterative(
   
 )
 
-# --- 3. Process and Combine All Data ---
+# Process and Combine All Data
 
 # Function to extract the data frame from each response's JSON body
 extract_data <- function(resp) {
@@ -49,7 +52,7 @@ data_wdi <- final_data$data %>%
   select(iso3c, year, value) %>%
   rename(SN.ITK.SVFI.ZS = value)
 
-# 1. Identify Duplicates (Marking all rows that are part of a duplicate group)
+# Identify Duplicates (Marking all rows that are part of a duplicate group)
 df_with_dupes <- data_wdi %>%
   group_by(!!sym("iso3c"), !!sym("year")) %>% # Group by the combination of the two columns
   mutate(n = n()) %>%                     # Count the number of rows in each group
