@@ -90,13 +90,19 @@ id <- read.csv("input/ID_OWN.csv") %>%
   mutate(variable = "ID_OWN") %>%
   select(iso3c, year, variable, value)
 
+load("input/lifeexpectancy.Rda")
+lifeexpectancy <- select(lifeexpectancy, -source) |>
+  rename(iso3c = code, value = lifeexpectancy) |>
+  mutate(variable = "lifeexpectancy")
+
 values <- values |>
   rbind(poverty) |>
   rbind(chloro) |>
   rbind(subsidy) |>
   #rbind(eyrs) |>
   rbind(ai) |>
-  rbind(id)
+  rbind(id) |>
+  rbind(lifeexpectancy)
 
 values <- values |>
   merge(meta, by.x = "variable", 
