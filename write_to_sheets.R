@@ -3,8 +3,20 @@ library(googlesheets4)
 library(tidyr)
 library(dplyr)
 
-source("progress-sheet-dashboard.R")
-source("dashboard_indicator_data.R")
+# Collect all indicator values and aggregates
+source("collect_indicators_values.R")
+source("collect_indicators_aggregates.R")
+
+# Run scripts to prepare progress for non-WDI indicators
+source("prep/progress-electricity-supply.R")
+source("prep/progress-life-expectancy.R")
+source("prep/progress-sdg04-years-schooling.R")
+source("prep/progress-women-empowerment-index.R")
+
+# Calculate progress for WDI indicators, collect all progress data
+source("collect_indicators_progress.R")
+
+# Extend the metadata with data derived values
 source("extend_meta_with_data.R")
 
 values <- read.csv('output/values_sheet.csv')

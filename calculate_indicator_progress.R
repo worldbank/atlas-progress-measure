@@ -1,25 +1,15 @@
-
-# ____________________________ #
-# SAMPLE WORKFLOW  ####
-# ____________________________ #
-
-# This script demonstrates how to:
-# 1. Retrieve indicator data from WDI
-# 2. Run the full model using {trackr} and optionally export results to Excel
-# 3. Apply additional formatting steps to prepare the output for the SDG dashboard and export to Excel
-
-# Preliminary operations
-#rm(list=ls())
+# Script run from within progress_sheet_dashboard, which sets the indicator_wdi environment variable
+# Calculates the progress for the selected indicator, output is in the dashboard variable
 
 # Import packages & metadata
 rm(list=ls())
-library(trackr)
 library(collapse)
 library(readxl)
 library(dplyr)
+## Make sure you have the latest version installed ####
+# devtools::install_github("RossanaTat/trackr@DEV")
+library(trackr)
 
-
-## !! NOTE: Add your own path ####
 meta <- read.csv("output/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
@@ -27,21 +17,12 @@ meta <- read.csv("output/meta_sheet.csv") |>
                   "low")
   ) %>%
   rename(indicator_select = indicator_wdi)
-## Make sure you have the latest version installed ####
-# devtools::install_github("RossanaTat/trackr@DEV")
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Example: SDG 2 ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Input data __________ #
-#indicator_wdi <- "SL.TLF.ACTI.FE.ZS"
-data_wdi <- wbstats::wb_data(indicator = indicator_wdi,
-                             lang      = "en",
-                             country   = "countries_only")
+# Input data
+# This data is already in values_sheet.csv, take it from there?
+data_wdi <- wbstats::wb_data(indicator = indicator_wdi, lang = "en", country = "countries_only")
 
-
-# Params from wdi metadata  ----- #
-# Change depending on which SDG, this example is SDG 2
+# Params from wdi metadata
 meta_indicator <- meta %>%
   filter(indicator_select == indicator_wdi)
 target         <- meta_indicator$target_value
@@ -51,7 +32,7 @@ indicator_sdg  <- meta_indicator$indicator_sdg
 startyear_data <- 1950
 endyear_data   <- meta_indicator$end_prog_eval
 
-# Track progress  _____ ####
+# Track progress
 progress_results <-  suppressWarnings(
   trackr::track_progress(
   data           = data_wdi,
@@ -75,19 +56,15 @@ progress_results <-  suppressWarnings(
   granularity    = meta_indicator$granularity
 ))
 
-
-#track_progress## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Prepare data for SDG dashboard ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
-## some outputs ------- ####
+# Prepare data for SDG dashboard
+## some outputs
 path_speed  <- progress_results$predicted_changes$path_speed
 score_speed <- progress_results$scores$speed
 typical_value <- progress_results$path_historical$speed
 
 future <- progress_results$path_future$speed
 
-# Fromatting the data
+# Formatting the data
 data_wdi <- data_wdi |>
   frename(
     c(year = "date", code = "iso3c", y = indicator_wdi),
@@ -100,10 +77,7 @@ data_wdi <- data_wdi |>
   fmutate(target = target,
           best   = best)
 
-
-
 # Prepare data on when target was reached
-
 if (!is.na(target)) {
   if (best=="low") {
     targetreachpast <- data_wdi |>
@@ -228,23 +202,6 @@ dashboard <- data_wdi |>
                         NA,
                         pctl))
 
-
 dashboard <- dashboard[,c(8,6,7,4,5,2,14,13,1,3,11,10,9,12,15)]
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Export to Excel ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
-## !! NOTE: Add your own path ####
-
-
-### Progress results -output of {trackr} ####
-#trackr::export_results_to_excel(res_list  = progress_results,
-#                                file_path = "P:\\02.personal\\wb621604\\trackr_testing\\progress_results.xlsx")
-
-
-### Dashboard Data ####
-#writexl::write_xlsx(dashboard, "P:\\02.personal\\wb621604\\trackr_testing\\dashboard_output.xlsx")
 
 
