@@ -9,7 +9,7 @@ sdg,indicatorname,indicatorshort,indicator_wdi,indicator,indicator_sdg,min,max,m
 8,GDP per capita (constant 2015 US$),GDP per capita,NY.GDP.PCAP.KD,NY.GDP.PCAP.KD,8.1.1,122.6789,89884.08,1,93850,2015,2024,0.6,3,"c(0.05, 0.05)",US$ per capita
 9,Individuals using the Internet (% of population),Individuals using the Internet,IT.NET.USER.ZS,IT.NET.USER.ZS,17.8.1,NULL,NULL,1,95,2015,2024,0.1,1,"c(0.02, 0.02)",% of population
 10,Prosperity gap (average shortfall from a prosperity standard of $25/day),Prosperity gap,SI.SPR.PGAP,SI.SPR.PGAP,10.1.1,0,NULL,0,0.5,2015,2024,0.1,1,"c(0.02, 0.02)",gap from prosperity standard
-11,Population living in slums (% of urban population),Population living in slums,EN.POP.SLUM.UR.ZS,EN.POP.SLUM.UR.ZS,,NULL,NULL,0,0,2015,2023,0.1,1,"c(0.02, 0.02)",% of urban population
+11,Population living in slums (% of urban population),Population living in slums,EN.POP.SLUM.UR.ZS,EN.POP.SLUM.UR.ZS,11.0.0,NULL,NULL,0,0,2015,2023,0.1,1,"c(0.02, 0.02)",% of urban population
 12,Fossil fuel subsidy (% of GDP),Fossil fuel subsidy,FF.SUB.GDP.ZS,FF.SUB.GDP.ZS,12.c.1,,,0,0,,,,,,% of GDP
 13,Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita),Total greehouse gases per capita,EN.GHG.ALL.PC.CE.AR5,EN.GHG.ALL.PC.CE.AR5,13.2.2,,,0,0,2015,2023,0.1,1,"c(0.02, 0.02)",t CO2e/capita
 14,"Chlorophyll-a deviations, remote sensing (%)",Chlorophyll-a deviations,NA,EN_MAR_CHLDEV,14.1.1,,,0,0,,,,,,%
