@@ -13,29 +13,24 @@
 
 # Import packages & metadata
 rm(list=ls())
-library(trackr)
 library(collapse)
 library(readxl)
 library(dplyr)
+library(tidyr)
 library(haven)
+## Make sure you have the latest version installed ####
+#devtools::install_github("RossanaTat/trackr")
+library(trackr)
 
-## !! NOTE: Add your own path ####
-meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/output/meta_sheet.csv") |>
+meta <- read.csv("output/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
                   "low")
-  ) %>%
-  rename(indicator_select = indicator_wdi) 
+  ) |>
+  dplyr::rename(indicator_select = indicator_wdi) 
 
-## Make sure you have the latest version installed ####
-#devtools::install_github("RossanaTat/trackr")
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Life expectancy ####
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# Input data __________ #
+# Input data
 indicator_wdi <- "SCH_YRS"
 load("input/education.Rda")
 data_wdi <- education %>%
@@ -88,7 +83,7 @@ path_speed  <- progress_results$predicted_changes$path_speed
 score_speed <- progress_results$scores$speed
 typical_value <- progress_results$path_historical$speed
 
-# Fromatting the data
+# Formatting the data
 data_wdi <- data_wdi %>%
   rename(y = education) %>%
   select(year, code, y) %>%
