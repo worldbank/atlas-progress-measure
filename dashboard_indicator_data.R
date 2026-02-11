@@ -13,11 +13,14 @@ meta <- read.csv("output/meta_sheet.csv")
 progress <- read.csv("output/progress_sheet.csv")
 
 # Dashboard indicators list
-dashboard_indicators <- meta %>%
-  filter(sdg != 1 & sdg != 12 & sdg != 14 & !is.na(indicator))
+wdind <- c("SN.ITK.DEFC.ZS", "SL.TLF.ACTI.FE.ZS", "SH.H2O.SMDW.ZS",
+           "EG.ELC.ACCS.ZS", "NY.GDP.PCAP.KD", "IT.NET.USER.ZS", 
+           "SI.SPR.PGAP", "EN.POP.SLUM.UR.ZS", "EN.GHG.ALL.PC.CE.AR5",
+           "ER.LND.PTLD.ZS", "IQ.SPI.OVRL",
+           "SH.DYN.MORT", "SH.DYN.NMRT", "SH.STA.MMRT")
 
 # Load and process data from WDI for SDG 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 17
-data_wdi <- wbstats::wb_data(indicator = dashboard_indicators$indicator,
+data_wdi <- wbstats::wb_data(indicator = wdind,
                              country="countries_only") |>
   rename("year" = "date","code" = "iso3c") 
 
@@ -32,6 +35,13 @@ poverty <- read.csv("input/poverty-country.csv") %>%
          value = rate
          ) %>%
   mutate(variable = "SI.POV.DDAY")
+
+# Load and process data for SDG 4
+eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
+  rename(iso3c = wbcode,
+         value = eys_mf_fill) %>%
+  mutate(variable = "HCI_EYRS") %>%
+  select(iso3c, year, variable, value)
 
 # Load and process data for SDG 12
 subsidy <- read_excel("input/Fossil Fuel Subsidy Map.xlsx", sheet = 1) %>%
@@ -50,10 +60,39 @@ chloro <- read.csv("input/goal-14-input.csv") %>%
   mutate(variable = "EN_MAR_CHLDEV") %>%
   filter(iso3c %in% cntries$iso3c)
 
+# Load and process data for AI chapter
+ai <- read.csv("input/chatgpt.csv") %>%
+  rename(iso3c = iso3,
+         value = traffic_per_internet_user) %>%
+  mutate(variable = "GPT.USE") %>%
+  select(iso3c, year, variable, value)
+
+# Load and process data for ID ownership chapter
+countries <- values %>%
+  distinct(iso3c) %>%
+  pull(iso3c)
+
+id <- read.csv("input/ID_OWN.csv") %>%
+  filter(SEX == "_T",
+         AGE == "_T",
+         URBANISATION == "_T",
+         COMP_BREAKDOWN_1 == "_T",
+         COMP_BREAKDOWN_2 == "_T",
+         COMP_BREAKDOWN_3 == "_T",
+         REF_AREA %in% countries) %>%
+  rename(iso3c = REF_AREA,
+         year = TIME_PERIOD,
+         value = OBS_VALUE) %>%
+  mutate(variable = "ID_OWN") %>%
+  select(iso3c, year, variable, value)
+
 values <- values |>
   rbind(poverty) |>
   rbind(chloro) |>
-  rbind(subsidy)
+  rbind(subsidy) |>
+  rbind(eyrs) |>
+  rbind(ai) |>
+  rbind(id)
 
 values <- values |>
   merge(meta, by.x = "variable", 
@@ -67,10 +106,12 @@ values <- values |>
 write.csv(values, "output/values_sheet.csv", row.names = FALSE)
 
 #### Aggregate values
+aggs <- c("WLD", "HIC", "UMC", "LMC", "LIC", "SSF",
+          "LCN", "SAS", "MEA", "NAC", "EAS", "ECS")
+
 # Load data from WDI
-data_agg <- wbstats::wb_data(indicator = dashboard_indicators$indicator,
-                             country=c("WLD", "HIC", "UMC", "LMC", "LIC", "SSF",
-                                       "LCN", "SAS", "MEA", "NAC", "EAS", "ECS")) |>
+data_agg <- wbstats::wb_data(indicator = wdind,
+                             country=aggs) |>
   rename("year" = "date","code" = "iso3c") |>
   mutate(code = ifelse(country == "High income", "HIC", code),
          code = ifelse(country == "Low income", "LIC", code),
@@ -104,6 +145,14 @@ d1 <- read.csv("input/poverty-global.csv") %>%
   rename(value = rate) %>%
   mutate(variable = "SI.POV.DDAY")
 
+# Load SDG 4 data from input folder
+# ed1 <- read_dta("input/EYS_data_update_2025 2.dta") %>%
+#   filter(wbcode %in% aggs)  %>%
+#   rename(iso3c = wbcode,
+#          value = eys_mf_fill) %>%
+#   mutate(variable = "HCI_EYRS") %>%
+#   select(iso3c, year, variable, value)
+#   
 # Load SDG 12 data from input folder
 d12 <- read_excel("input/fossil_fuel_subsidy_global.xlsx", sheet = 1) %>%
   rename(value = `Fossil fuel subsidy (% of GDP)`,
@@ -120,6 +169,29 @@ d14 <- jsonlite::fromJSON(paste('https://unstats.un.org/SDGAPI/v1/sdg/Series/Dat
   rename(year = timePeriodStart,
          variable = series)
 
+# # Load and process data for AI chapter
+# d16 <- read.csv("input/chatgpt.csv") %>%
+#   rename(iso3c = iso3,
+#          value = traffic_per_internet_user) %>%
+#   filter(iso3c %in% aggs) %>%
+#   mutate(variable = "GPT.USE") %>%
+#   select(iso3c, year, variable, value)
+
+# Load and process data for ID ownership chapter
+# d18 <- read.csv("input/ID_OWN.csv") %>%
+#   filter(SEX == "_T",
+#          AGE == "_T",
+#          URBANISATION == "_T",
+#          COMP_BREAKDOWN_1 == "_T",
+#          COMP_BREAKDOWN_2 == "_T",
+#          COMP_BREAKDOWN_3 == "_T",
+#          REF_AREA %in% aggs) %>%
+#   rename(iso3c = REF_AREA,
+#          year = TIME_PERIOD,
+#          value = OBS_VALUE) %>%
+#   mutate(variable = "ID_OWN") %>%
+#   select(iso3c, year, variable, value)
+
 values_agg <- data_agg %>%
   select(-iso2c, -country) %>%
   melt(id.vars = c("code", "year")) %>%
@@ -135,4 +207,5 @@ values_agg <- values_agg %>%
   filter(year > 2009)
   
 write.csv(values_agg, "output/values_agg_sheet.csv", row.names = FALSE)
+
 

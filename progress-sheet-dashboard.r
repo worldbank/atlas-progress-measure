@@ -14,9 +14,12 @@ meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 202
 
 dashboard_final <- data.frame()
 indicators <- na.omit(meta$indicator_wdi)
+wdind <- c("SN.ITK.DEFC.ZS", "SL.TLF.ACTI.FE.ZS", "SH.H2O.SMDW.ZS",
+           "EG.ELC.ACCS.ZS", "IT.NET.USER.ZS", "IQ.SPI.OVRL",
+           "SH.DYN.MORT", "SH.DYN.NMRT", "SH.STA.MMRT")
 
-### SDG 2, 3, 4, 5, 6, 7, 9, 17 ###
-for (indicator_wdi in indicators[c(2:7, 9, 12)]) {
+### SDG 2, 3, 5, 6, 7, 9, 17 ###
+for (indicator_wdi in wdind) {
   
   env <- new.env(parent = globalenv())
   env$indicator_wdi <- indicator_wdi
@@ -28,17 +31,20 @@ for (indicator_wdi in indicators[c(2:7, 9, 12)]) {
   
   }
 
-### Merge in SDG 1, 8, and 10 data
+### Merge in SDG 1, 4, 8, and 10 data
 sdg1 <- read_excel("new_dashboard_output_SDG1.xlsx", sheet = 1)
+sdg4 <- read_excel("dashboard_output_SDG4.xlsx", sheet = 1) %>%
+  mutate(pctl = NA)
 sdg8 <- read_excel("dashboard_output_SDG8.xlsx", sheet = 1)
-sdg10 <- read_excel("dashboard_output_SDG10.xlsx", sheet = 1)
+sdg10 <- read_excel("dashboard_output_SDG10_14Jan.xlsx", sheet = 1)  %>%
+  mutate(reach_target = NULL)
 
-dashboard1810 <- sdg1 |>
-  rbind(sdg8, sdg10) |>
+dashboard14810 <- sdg1 |>
+  rbind(sdg4, sdg8, sdg10) |>
   select(-c("pctl"))
 
 dashboard_final <- dashboard_final |>
-  rbind(dashboard1810) |>
+  rbind(dashboard14810) |>
   rename(iso3c = code) |>
   select(-c("indicator_wdi", "more_is_better", "target_value", "target", "best", "indicatorname"))
 
