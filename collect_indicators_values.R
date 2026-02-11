@@ -5,6 +5,7 @@ library(tidyverse)
 library(quantregGrowth)
 library(wbstats)
 library(readxl)
+library(haven)
 #load("poverty.Rda")
 #load("ghggdp.Rda")
 
@@ -39,17 +40,17 @@ poverty <- read.csv("input/poverty-country.csv") %>%
   mutate(variable = "SI.POV.DDAY")
 
 # Load and process data for SDG 4
-# .dta file is missing
-eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
-  rename(iso3c = wbcode,
-         value = eys_mf_fill) %>%
-  mutate(variable = "HCI_EYRS") %>%
-  select(iso3c, year, variable, value)
+# Error: .dta file is missing
+# eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
+#   rename(iso3c = wbcode,
+#          value = eys_mf_fill) %>%
+#   mutate(variable = "HCI_EYRS") %>%
+#   select(iso3c, year, variable, value)
 
 # Load and process data for SDG 12
 subsidy <- read_excel("input/Fossil Fuel Subsidy Map.xlsx", sheet = 1) %>%
   select(-c("countryname", "region", "incomelevel")) %>%
-  melt(idvars = "iso3c") %>%
+  reshape2::melt(idvars = "iso3c") %>%
   rename(year = variable) %>%
   mutate(variable = "FF.SUB.GDP.ZS")
 

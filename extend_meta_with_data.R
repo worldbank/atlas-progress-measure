@@ -82,4 +82,4 @@ meta.extended <- left_join(meta, all_indicator_data, by = 'indicator_sdg') |>
   left_join(reached.target, by = 'indicator_sdg') |>
   left_join(mapping, by = "sdg")
 
-write.csv(meta.extended, file = 'output/meta_extended_sheet.csv', row.names = FALSE)
+write.csv(meta.extended, file = 'output/meta_extended_sheet.csv', row.names = FALSE, na = '')
