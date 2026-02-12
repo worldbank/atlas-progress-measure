@@ -66,7 +66,7 @@ all_indicator_data <- rbind(indicators, extents_values_diffs) |>
   left_join(value_extents, by = "indicator_sdg") |>
   mutate(across(where(is.numeric), ~ ifelse(is.infinite(.), NA_real_, .)))
 
-meta <- read.csv('output/meta_sheet.csv') |>
+meta <- read.csv('input/meta_sheet.csv') |>
   select(-indicatorname, -indicatorshort, -unit) |>
   mutate(indicator_360 = ifelse(!is.na(indicator_wdi), paste0('WB_WDI_', gsub("\\.", "_", indicator_wdi)), indicator_wdi))
 

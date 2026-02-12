@@ -10,7 +10,7 @@ library(dplyr)
 # devtools::install_github("RossanaTat/trackr@DEV")
 library(trackr)
 
-meta <- read.csv("output/meta_sheet.csv") |>
+meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",

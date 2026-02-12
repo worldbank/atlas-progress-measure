@@ -4,9 +4,10 @@
 rm(list=ls())
 library(dplyr)
 library(quantregGrowth)
+library(readxl)
 #source("dashboard_indicator_data.R")
 
-meta <- read.csv("output/meta_sheet.csv") |>
+meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
@@ -41,10 +42,12 @@ sdg4 <- read_excel("intermediate/dashboard_output_SDG4.xlsx", sheet = 1) %>%
 sdg8 <- read_excel("intermediate/dashboard_output_SDG8.xlsx", sheet = 1)
 sdg10 <- read_excel("intermediate/dashboard_output_SDG10_14Jan.xlsx", sheet = 1)  %>%
   mutate(reach_target = NULL)
+lifexp <- read_excel("intermediate/dashboard_output_lifeexpectancy.xlsx", sheet = 1)
 
 dashboard14810 <- sdg1 |>
   rbind(sdg4, sdg8, sdg10) |>
-  select(-c("pctl"))
+  select(-c("pctl")) |>
+  rbind(lifexp)
 
 dashboard_final <- dashboard_final |>
   rbind(dashboard14810) |>
@@ -96,6 +99,3 @@ write.csv(dashboard_final, file="output/progress_sheet.csv", row.names = FALSE)
 # 
 # write.csv(progress,
 #           file="output/progress_sheet.csv", row.names = FALSE)
-# 
-# write.csv(meta,
-#           file="output/meta_sheet.csv", row.names = FALSE)

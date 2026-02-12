@@ -10,7 +10,7 @@ library(haven)
 #load("ghggdp.Rda")
 
 # read other data
-meta <- read.csv("output/meta_sheet.csv") 
+meta <- read.csv("input/meta_sheet.csv") 
 
 # Dashboard indicators list
 wdind <- c("SN.ITK.DEFC.ZS", "SL.TLF.ACTI.FE.ZS", "SH.H2O.SMDW.ZS",
