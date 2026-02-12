@@ -1,5 +1,5 @@
 # Get food insecurity data from Microdata API
-# Writesdg2-food-insecurity.csv csv file to input folder (but this file is nowhere used)
+# Write sdg2-food-insecurity.csv csv file to input folder (but this file is nowhere used)
 
 # Load necessary packages
 library(httr2)

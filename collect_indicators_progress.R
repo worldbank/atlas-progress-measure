@@ -5,7 +5,6 @@ rm(list=ls())
 library(dplyr)
 library(quantregGrowth)
 library(readxl)
-#source("dashboard_indicator_data.R")
 
 meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
