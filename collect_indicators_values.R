@@ -116,9 +116,10 @@ values <- values |>
   merge(meta, by.x = "variable", 
                 by.y = "indicator", 
                 all.x = T) |>
-  select(variable, iso3c, year, value, indicator_sdg)  |>
+  mutate(value = round(value, rounding)) |>
+  select(variable, iso3c, year, value, indicator_sdg) |>
   arrange(indicator_sdg, iso3c, year) |>
   mutate(year = as.numeric(year)) |>
   filter(year > 2009)
 
-write.csv(values, "output/values_sheet.csv", row.names = FALSE)
+write.csv(values, "output/values_sheet.csv", row.names = FALSE, na = '')

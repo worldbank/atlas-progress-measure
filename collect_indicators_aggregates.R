@@ -112,8 +112,9 @@ values_agg <- values_agg |>
   merge(meta, by.x = "variable", 
                 by.y = "indicator", 
                 all.x = T) |>
+  mutate(value = round(value, rounding)) |>
   select(variable, iso3c, year, value, indicator_sdg) |>
   mutate(year = as.numeric(year)) |>
   filter(year > 2009)
   
-write.csv(values_agg, "output/values_agg_sheet.csv", row.names = FALSE)
+write.csv(values_agg, "output/values_agg_sheet.csv", row.names = FALSE, na = '')
