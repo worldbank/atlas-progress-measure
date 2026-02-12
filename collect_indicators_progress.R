@@ -43,11 +43,13 @@ sdg8 <- read_excel("intermediate/dashboard_output_SDG8.xlsx", sheet = 1)
 sdg10 <- read_excel("intermediate/dashboard_output_SDG10_14Jan.xlsx", sheet = 1)  %>%
   mutate(reach_target = NULL)
 lifexp <- read_excel("intermediate/dashboard_output_lifeexpectancy.xlsx", sheet = 1)
+gender <- read_excel("intermediate/dashboard_output_gender.xlsx", sheet = 1)
 
 dashboard14810 <- sdg1 |>
   rbind(sdg4, sdg8, sdg10) |>
   select(-c("pctl")) |>
-  rbind(lifexp)
+  rbind(lifexp) |>
+  rbind(gender)
 
 dashboard_final <- dashboard_final |>
   rbind(dashboard14810) |>

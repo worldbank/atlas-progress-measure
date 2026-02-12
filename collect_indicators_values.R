@@ -90,10 +90,17 @@ id <- read.csv("input/ID_OWN.csv") %>%
   mutate(variable = "ID_OWN") %>%
   select(iso3c, year, variable, value)
 
+# Life expectancy at birth, total (years), 43.0.0
+# Take from WDI?
 load("input/lifeexpectancy.Rda")
 lifeexpectancy <- select(lifeexpectancy, -source) |>
   rename(iso3c = code, value = lifeexpectancy) |>
   mutate(variable = "lifeexpectancy")
+
+# Women political empowerment index, 45.0.0
+load("input/gender.Rda")
+gender <- select(gender, year, iso3c = code, value = gender) |>
+  mutate(variable = "WOMEN.INDEX")
 
 values <- values |>
   rbind(poverty) |>
@@ -102,7 +109,8 @@ values <- values |>
   #rbind(eyrs) |>
   rbind(ai) |>
   rbind(id) |>
-  rbind(lifeexpectancy)
+  rbind(lifeexpectancy) |>
+  rbind(gender)
 
 values <- values |>
   merge(meta, by.x = "variable", 
