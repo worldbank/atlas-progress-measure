@@ -1,4 +1,6 @@
 library(tidyverse)
+library(haven)
+library(readxl)
 
 # Dashboard indicators list
 wdind <- c("SN.ITK.DEFC.ZS", "SL.TLF.ACTI.FE.ZS", "SH.H2O.SMDW.ZS",
@@ -60,6 +62,7 @@ d1 <- read.csv("input/poverty-global.csv") %>%
   mutate(variable = "SI.POV.DDAY")
 
 # Load SDG 4 data from input folder
+# Data does not include aggregates
 # ed1 <- read_dta("input/EYS_data_update_2025 2.dta") %>%
 #   filter(wbcode %in% aggs)  %>%
 #   rename(iso3c = wbcode,
