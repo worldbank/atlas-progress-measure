@@ -10,7 +10,7 @@ library(dplyr)
 library(tidyr)
 library(haven)
 ## Make sure you have the latest version installed ####
-#devtools::install_github("RossanaTat/trackr")
+devtools::install_github("RossanaTat/trackr")
 library(trackr)
 
 meta <- read.csv("input/meta_sheet.csv") |>

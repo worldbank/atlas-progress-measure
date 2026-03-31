@@ -7,6 +7,7 @@ library(collapse)
 library(readxl)
 library(dplyr)
 library(haven)
+library(tidyr)
 ## Make sure you have the latest version installed ####
 #devtools::install_github("RossanaTat/trackr")
 library(trackr)

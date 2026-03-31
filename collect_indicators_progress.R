@@ -5,6 +5,34 @@ rm(list=ls())
 library(dplyr)
 library(quantregGrowth)
 library(readxl)
+setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/")
+
+### Full indicator list:
+## From WDI (Atlas stories)
+# 1 Gender: SL.TLF.ACTI.FE.ZS
+# 2 Prosperity: SI.SPR.PGAP
+# 3 Electricity: EG.ELC.ACCS.ZS
+# 4 Internet: IT.NET.USER.ZS
+# 5 SPI: IQ.SPI.OVRL
+
+## Direct downloads (Atlas stories)
+# 6 Education: HCI_EYRS
+# 7 Water: wat_imp_prem_t
+# 8 Water: wat_imp_qual_t
+# 9 Water: wat_imp_av_t
+
+## Direct downloads (Progress paper indicators)
+# 10 Poverty: SI.POV.DDAY
+# 11 Electricity: ELEC_SUP_PC
+# 12 Gender: WOMEN.INDEX
+# 13 Health: lifeexpectancy
+# 14 Climate: carbon_intensity
+
+## No dashboard indicator
+# Climate
+# Urban development
+# Overall progress
+# Artificial intelligence
 
 meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
@@ -16,12 +44,10 @@ meta <- read.csv("input/meta_sheet.csv") |>
 dashboard_final <- data.frame()
 indicators <- na.omit(meta$indicator_wdi)
 
-# These need to be added, but give an error: "SL.TLF.ACTI.FE.ZS", "SH.STA.MMRT"
-wdind <- c("SN.ITK.DEFC.ZS", "SH.H2O.SMDW.ZS",
-           "EG.ELC.ACCS.ZS", "IT.NET.USER.ZS", "IQ.SPI.OVRL",
-           "SH.DYN.MORT", "SH.DYN.NMRT")
+wdind <- c("SL.TLF.ACTI.FE.ZS", "EG.ELC.ACCS.ZS", 
+           "IT.NET.USER.ZS", "IQ.SPI.OVRL", "SI.SPR.PGAP")
 
-### SDG 2, 3, 5, 6, 7, 9, 17
+### SDG 5, 7, 9, 17
 for (indicator_wdi in wdind) {
   print(indicator_wdi)
   
@@ -34,21 +60,27 @@ for (indicator_wdi in wdind) {
   dashboard_final <- rbind(dashboard_final, df)
 }
 
-### Merge in SDG 1, 4, 8, and 10 data
-sdg1 <- read_excel("intermediate/new_dashboard_output_SDG1.xlsx", sheet = 1)
+### Merge in SDG 1, 4, 10, life expectancy, gender, ghggdp, water components
+### data
+sdg1 <- read_excel("intermediate/dashboard_output_poverty.xlsx", sheet = 1)
 sdg4 <- read_excel("intermediate/dashboard_output_SDG4.xlsx", sheet = 1) %>%
-  mutate(pctl = NA)
-sdg8 <- read_excel("intermediate/dashboard_output_SDG8.xlsx", sheet = 1)
-sdg10 <- read_excel("intermediate/dashboard_output_SDG10_14Jan.xlsx", sheet = 1)  %>%
-  mutate(reach_target = NULL)
+  mutate(pctl = NULL)
+#sdg8 <- read_excel("intermediate/dashboard_output_SDG8.xlsx", sheet = 1)
+#sdg10 <- read_excel("intermediate/dashboard_output_SDG10_14Jan.xlsx", sheet = 1)  %>%
+#  mutate(reach_target = NULL)
 lifexp <- read_excel("intermediate/dashboard_output_lifeexpectancy.xlsx", sheet = 1)
 gender <- read_excel("intermediate/dashboard_output_gender.xlsx", sheet = 1)
+ghggdp <- read_excel("intermediate/dashboard_output_ghggdp.xlsx", sheet = 1)
+sdg6 <- read_excel("intermediate/dashboard_output_water_components.xlsx", sheet = 1)
+electricity <- read_excel("intermediate/dashboard_output_electricity.xlsx", sheet = 1)
 
 dashboard14810 <- sdg1 |>
-  rbind(sdg4, sdg8, sdg10) |>
-  select(-c("pctl")) |>
+  rbind(sdg4) |>
   rbind(lifexp) |>
-  rbind(gender)
+  rbind(gender) |>
+  rbind(ghggdp) |>
+  rbind(sdg6) |>
+  rbind(electricity)
 
 dashboard_final <- dashboard_final |>
   rbind(dashboard14810) |>
@@ -57,46 +89,4 @@ dashboard_final <- dashboard_final |>
 
 write.csv(dashboard_final, file="output/progress_sheet.csv", row.names = FALSE)
 
-#meta <- meta |>
-#  select(-c("indicator_wdi", "more_is_better", "target_value", "target", "best", "indicatorname"))
 
-#write.csv(dashboard_final, file="output/meta_sheet_output.csv", row.names = FALSE)
-
-### SDG 8
-# dashboard_final2 <- data.frame()
-# for (indicator_wdi in indicators[8]) {
-#   
-#   env <- new.env(parent = globalenv())
-#   env$indicator_wdi <- indicator_wdi
-#   sys.source("sdg_output_script.R", envir = env)   # run the script using this value
-#   
-#   df <- get("dashboard", envir = env)
-#   
-#   dashboard_final2 <- rbind(dashboard_final2, df)
-#   
-# }
-# 
-# dashboard_final <- rbind(dashboard_final, dashboard_final2)
-# 
-# 
-# ### SDG 1
-# load("poverty_results.Rda")
-# 
-# #write.csv(dashboard_final,file="output/progress_data_dashboard.csv", row.names = FALSE)
-# #dashboard_final <- read.csv("output/progress_data_dashboard.csv")
-# 
-# progress <- dashboard_final %>%
-#   select(indicator_sdg, iso3c, speed, pctl, 
-#          reach_target, reach_target_year, 
-#          typical_end_value, start_year, end_year, start_value,
-#          end_value) %>%
-#   arrange(indicator_sdg)
-# 
-# meta <- dashboard_final %>%
-#   select(sdg, indicatorname, indicator_wdi, 
-#          indicator_sdg, more_is_better, 
-#          target_value) %>%
-#   distinct()
-# 
-# write.csv(progress,
-#           file="output/progress_sheet.csv", row.names = FALSE)
