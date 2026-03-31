@@ -3,22 +3,14 @@ library(haven)
 library(readxl)
 
 # Dashboard indicators list
-wdind <- c("SN.ITK.DEFC.ZS", "SL.TLF.ACTI.FE.ZS", "SH.H2O.SMDW.ZS",
-           "EG.ELC.ACCS.ZS", "NY.GDP.PCAP.KD", "IT.NET.USER.ZS", 
-           "SI.SPR.PGAP", "EN.POP.SLUM.UR.ZS", "EN.GHG.ALL.PC.CE.AR5",
-           "ER.LND.PTLD.ZS", "IQ.SPI.OVRL",
-           "SH.DYN.MORT", "SH.DYN.NMRT", "SH.STA.MMRT")
-
+wdind <- c("SL.TLF.ACTI.FE.ZS", "EG.ELC.ACCS.ZS", 
+           "IT.NET.USER.ZS", "IQ.SPI.OVRL", "SI.SPR.PGAP")
 #### Aggregate values
 aggs <- c("WLD", "HIC", "UMC", "LMC", "LIC", "SSF", "LCN", "SAS", "MEA", "NAC", "EAS", "ECS")
 
 # Load data from WDI
 # Split into batches to avoid timeout
-agg_batch1 <- wbstats::wb_data(indicator = wdind[1:7], country = aggs)
-Sys.sleep(2)
-agg_batch2 <- wbstats::wb_data(indicator = wdind[8:14], country = aggs)
-
-data_agg <- full_join(agg_batch1, agg_batch2, by = c('iso2c', 'iso3c', 'country', 'date')) |>
+data_agg <- wbstats::wb_data(indicator = wdind, country = aggs) |>
   select(-iso2c, -country) |>
   rename("year" = "date") |>
   pivot_longer(cols = 3:16, names_to = 'variable', values_to = 'value') |>
@@ -71,11 +63,11 @@ d1 <- read.csv("input/poverty-global.csv") %>%
 #   select(iso3c, year, variable, value)
 
 # Load SDG 12 data from input folder
-d12 <- read_excel("input/fossil_fuel_subsidy_global.xlsx", sheet = 1) %>%
-  rename(value = `Fossil fuel subsidy (% of GDP)`,
-         iso3c = region_code) %>%
-  mutate(variable = "FF.SUB.GDP.ZS") %>%
-  select(iso3c, year, value, variable)
+# d12 <- read_excel("input/fossil_fuel_subsidy_global.xlsx", sheet = 1) %>%
+#   rename(value = `Fossil fuel subsidy (% of GDP)`,
+#          iso3c = region_code) %>%
+#   mutate(variable = "FF.SUB.GDP.ZS") %>%
+#   select(iso3c, year, value, variable)
 
 # Load SDG 14 data from UNSDG website
 # d14 <- jsonlite::fromJSON(paste('https://unstats.un.org/SDGAPI/v1/sdg/Series/Data?seriesCode=EN_MAR_CHLDEV&pageSize=10000',sep=""), flatten = TRUE)$data %>%

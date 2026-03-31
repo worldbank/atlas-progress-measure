@@ -7,7 +7,7 @@ library(collapse)
 library(readxl)
 library(dplyr)
 ## Make sure you have the latest version installed ####
-# devtools::install_github("RossanaTat/trackr@DEV")
+# devtools::install_github("RossanaTat/trackr@DEV", force = TRUE)
 library(trackr)
 
 meta <- read.csv("input/meta_sheet.csv") |>
@@ -19,6 +19,7 @@ meta <- read.csv("input/meta_sheet.csv") |>
   rename(indicator_select = indicator_wdi)
 
 # Input data
+#indicator_wdi <- "SN.ITK.DEFC.ZS"
 # This data is already in values_sheet.csv, take it from there?
 data_wdi <- wbstats::wb_data(indicator = indicator_wdi, lang = "en", country = "countries_only")
 
@@ -55,6 +56,7 @@ progress_results <-  suppressWarnings(
   support        = meta_indicator$support,
   granularity    = meta_indicator$granularity
 ))
+
 
 # Prepare data for SDG dashboard
 ## some outputs
@@ -149,7 +151,8 @@ dashboard_speed <- progress_results$scores$speed |>
          -time_start,
          -y_speed) |>
   merge(typical_value, by = "code") |>
-  rename("typical_end_value" = "y_speed")
+  rename("typical_end_value" = "y_speed") |>
+  select(-`.joyn`)
 
 # Merge all
 dashboard <- data_wdi |>
