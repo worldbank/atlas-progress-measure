@@ -28,7 +28,7 @@ setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-pro
 # 13 Health: lifeexpectancy
 # 14 Climate: carbon_intensity
 
-## No dashboard indicator
+## No progress indicators
 # Climate
 # Urban development
 # Overall progress

@@ -32,27 +32,39 @@ library(reshape2)
 # 13 Health: lifeexpectancy
 # 14 Climate: carbon_intensity
 
-## No dashboard indicator
+## No progress but needs value indicator
 # Climate
 # Urban development
-# Overall progress
 # Artificial intelligence
+
+## No progress or values
+# Overall progress
 
 # read other data
 meta <- read.csv("input/meta_sheet.csv") 
 
 # Dashboard indicators list
 wdind <- c("SL.TLF.ACTI.FE.ZS", 
-           "EG.ELC.ACCS.ZS",  "IT.NET.USER.ZS", 
-           "SI.SPR.PGAP",  "IQ.SPI.OVRL")
+           "EG.ELC.ACCS.ZS",  "IT.NET.USER.ZS", "EN.POP.SLUM.UR.ZS",
+           "SI.SPR.PGAP", "EN.GHG.ALL.PC.CE.AR5",  "IQ.SPI.OVRL")
 
 # Load and process data from WDI for SDG 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 17
 # Split into batches to avoid timeout
-data_wdi <- wbstats::wb_data(indicator = wdind, country="countries_only")
+batch1 <- wbstats::wb_data(indicator = wdind[1:4], country="countries_only")
+batch2 <- wbstats::wb_data(indicator = wdind[5:7], country="countries_only")
+data_wdi <- rbind(batch1, batch2)
 
 values <- data_wdi |>
   select(-iso2c, -country) |>
   pivot_longer(cols = 3:7, names_to = 'variable', values_to = 'value')
+
+# Load and process data for SDG 4
+ai <- read.csv("input/chatgpt.csv") %>%
+  rename(iso3c = iso3,
+         value = traffic_per_internet_user,
+         date = year) %>%
+  mutate(variable = "GPT.USE") %>%
+  select(iso3c, date, variable, value)
 
 # Load and process data for SDG 4
 eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
@@ -109,7 +121,8 @@ values <- values |>
   rbind(lifeexpectancy) |>
   rbind(gender) |>
   rbind(electricity) |>
-  rbind(climate)
+  rbind(climate) |>
+  rbind(ai)
 
 values <- values |>
   merge(meta, by.x = "variable", 
