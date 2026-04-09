@@ -68,7 +68,7 @@ all_indicator_data <- rbind(indicators, extents_values_diffs) |>
 
 meta <- read.csv('input/meta_sheet.csv') |>
   select(-indicatorname, -indicatorshort, -unit) |>
-  mutate(indicator_360 = ifelse(!is.na(indicator_wdi), paste0('WB_WDI_', gsub("\\.", "_", indicator_wdi)), indicator_wdi))
+  mutate(indicator_360 = ifelse(!indicator_wdi == '', paste0('WB_WDI_', gsub("\\.", "_", indicator_wdi)), NA))
 
 # Add pillars mapping
 mapping <- read.csv("input/goals-pillars-mapping.csv")
