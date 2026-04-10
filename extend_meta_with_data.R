@@ -24,6 +24,7 @@ values <- read.csv('output/values_sheet.csv')
 
 # In case no progress data is available
 year_extents <- filter(values, !(indicator_sdg %in% indicators$indicator_sdg)) |>
+  filter(!is.na(value)) |>
   filter(year > 2014) |>
   group_by(indicator_sdg) |>
   summarise(
@@ -31,7 +32,8 @@ year_extents <- filter(values, !(indicator_sdg %in% indicators$indicator_sdg)) |
     maxEndYear = max(year, na.rm = TRUE),
   )
 
-values_summarised <- group_by(values, indicator_sdg, year) |>
+values_summarised <- filter(values, !is.na(value)) |>
+  group_by(indicator_sdg, year) |>
   summarise(
     minValue = min(value, na.rm = TRUE),
     maxValue = max(value, na.rm = TRUE)
@@ -64,7 +66,20 @@ all_indicator_data <- rbind(indicators, extents_values_diffs) |>
   left_join(value_extents, by = "indicator_sdg") |>
   mutate(across(where(is.numeric), ~ ifelse(is.infinite(.), NA_real_, .)))
 
-meta <- read.csv('output/meta_sheet.csv')
-meta.extended <- left_join(meta, all_indicator_data, by = 'indicator_sdg')
+meta <- read.csv('input/meta_sheet.csv') |>
+  select(-indicatorname, -indicatorshort, -unit) |>
+  mutate(indicator_360 = ifelse(!indicator_wdi == '', paste0('WB_WDI_', gsub("\\.", "_", indicator_wdi)), NA))
 
-write.csv(meta.extended, file = 'output/meta_extended_sheet.csv', row.names = FALSE)
+# Add pillars mapping
+mapping <- read.csv("input/goals-pillars-mapping.csv")
+
+# Number of countries that reached the target
+reached.target <- left_join(prog, meta, by = "indicator_sdg") |>
+  group_by(indicator_sdg) |>
+  summarise(reached_target = sum(if_else(more_is_better == 1, end_value >= target_value, end_value <= target_value)))
+
+meta.extended <- left_join(meta, all_indicator_data, by = 'indicator_sdg') |>
+  left_join(reached.target, by = 'indicator_sdg') |>
+  left_join(mapping, by = "indicator_sdg")
+
+write.csv(meta.extended, file = 'output/meta_extended_sheet.csv', row.names = FALSE, na = '')
