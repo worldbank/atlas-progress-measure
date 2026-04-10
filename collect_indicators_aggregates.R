@@ -3,8 +3,9 @@ library(haven)
 library(readxl)
 
 # Dashboard indicators list
-wdind <- c("SL.TLF.ACTI.FE.ZS", "EG.ELC.ACCS.ZS", 
-           "IT.NET.USER.ZS", "IQ.SPI.OVRL", "SI.SPR.PGAP")
+wdind <- c("SL.TLF.ACTI.FE.ZS", 
+           "EG.ELC.ACCS.ZS",  "IT.NET.USER.ZS", "EN.POP.SLUM.UR.ZS",
+           "SI.SPR.PGAP", "EN.GHG.ALL.PC.CE.AR5",  "IQ.SPI.OVRL")
 #### Aggregate values
 aggs <- c("WLD", "HIC", "UMC", "LMC", "LIC", "SSF", "LCN", "SAS", "MEA", "NAC", "EAS", "ECS")
 
@@ -13,7 +14,7 @@ aggs <- c("WLD", "HIC", "UMC", "LMC", "LIC", "SSF", "LCN", "SAS", "MEA", "NAC", 
 data_agg <- wbstats::wb_data(indicator = wdind, country = aggs) |>
   select(-iso2c, -country) |>
   rename("year" = "date") |>
-  pivot_longer(cols = 3:16, names_to = 'variable', values_to = 'value') |>
+  pivot_longer(cols = 3:9, names_to = 'variable', values_to = 'value') |>
   mutate(iso3c = case_when(
     iso3c == "XD" ~ "HIC",
     iso3c == "XM" ~ "LIC",
@@ -101,7 +102,7 @@ d1 <- read.csv("input/poverty-global.csv") %>%
 #   mutate(variable = "ID_OWN") %>%
 #   select(iso3c, year, variable, value)
 
-values_agg <- rbind(data_agg, d1, d12)
+values_agg <- rbind(data_agg, d1)
 
 values_agg <- values_agg |>
   merge(meta, by.x = "variable", 

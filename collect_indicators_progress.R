@@ -5,7 +5,7 @@ rm(list=ls())
 library(dplyr)
 library(quantregGrowth)
 library(readxl)
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/")
+#setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/")
 
 ### Full indicator list:
 ## From WDI (Atlas stories)
@@ -44,7 +44,8 @@ meta <- read.csv("input/meta_sheet.csv") |>
 dashboard_final <- data.frame()
 indicators <- na.omit(meta$indicator_wdi)
 
-wdind <- c("SL.TLF.ACTI.FE.ZS", "EG.ELC.ACCS.ZS", 
+# Not working for "SL.TLF.ACTI.FE.ZS"
+wdind <- c("EG.ELC.ACCS.ZS", 
            "IT.NET.USER.ZS", "IQ.SPI.OVRL", "SI.SPR.PGAP")
 
 ### SDG 5, 7, 9, 17
@@ -85,7 +86,9 @@ dashboard14810 <- sdg1 |>
 dashboard_final <- dashboard_final |>
   rbind(dashboard14810) |>
   rename(iso3c = code) |>
-  select(-c("indicator_wdi", "more_is_better", "target_value", "target", "best", "indicatorname"))
+  select(-c("indicator_wdi", "more_is_better", "target_value", "target", "best", "indicatorname")) |>
+  # some empty rows are introduced somewhere, remove them
+  filter(!is.na(indicator_sdg))
 
 write.csv(dashboard_final, file="output/progress_sheet.csv", row.names = FALSE)
 

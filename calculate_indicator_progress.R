@@ -151,8 +151,8 @@ dashboard_speed <- progress_results$scores$speed |>
          -time_start,
          -y_speed) |>
   merge(typical_value, by = "code") |>
-  rename("typical_end_value" = "y_speed") |>
-  select(-`.joyn`)
+  rename("typical_end_value" = "y_speed") #|>
+  #select(-`.joyn`)
 
 # Merge all
 dashboard <- data_wdi |>

@@ -52,13 +52,17 @@ wdind <- c("SL.TLF.ACTI.FE.ZS",
 # Split into batches to avoid timeout
 batch1 <- wbstats::wb_data(indicator = wdind[1:4], country="countries_only")
 batch2 <- wbstats::wb_data(indicator = wdind[5:7], country="countries_only")
-data_wdi <- rbind(batch1, batch2)
 
-values <- data_wdi |>
+batch1.long <- batch1 |>
   select(-iso2c, -country) |>
-  pivot_longer(cols = 3:7, names_to = 'variable', values_to = 'value')
+  pivot_longer(cols = 3:6, names_to = 'variable', values_to = 'value')
+batch2.long <- batch2 |>
+  select(-iso2c, -country) |>
+  pivot_longer(cols = 3:5, names_to = 'variable', values_to = 'value')
 
-# Load and process data for SDG 4
+values <- rbind(batch1.long, batch2.long)
+
+# Load and process data for AI chapter
 ai <- read.csv("input/chatgpt.csv") %>%
   rename(iso3c = iso3,
          value = traffic_per_internet_user,
@@ -75,6 +79,7 @@ eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
   select(iso3c, date, variable, value)
 
 # Water SDG 6
+# NO DATA IN REPO
 water <- read_excel("~/Downloads/JMP_2025_WLD.xlsx", 
                     sheet = "wat") %>%
   select(iso3, year, wat_sm_t, wat_imp_prem_t, wat_imp_qual_t, wat_imp_av_t) %>%
@@ -116,7 +121,7 @@ climate <- ghggdp %>%
 
 values <- values |>
   rbind(poverty) |>
-  rbind(water) |>
+  #rbind(water) |>
   rbind(eyrs) |>
   rbind(lifeexpectancy) |>
   rbind(gender) |>
