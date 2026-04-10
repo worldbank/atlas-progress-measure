@@ -18,9 +18,11 @@ library(collapse)
 library(readxl)
 library(dplyr)
 library(haven)
+library(tidyr)
 
+setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
 ## !! NOTE: Add your own path ####
-meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/output/meta_sheet.csv") |>
+meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
@@ -30,7 +32,6 @@ meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 202
 
 ## Make sure you have the latest version installed ####
 #devtools::install_github("RossanaTat/trackr")
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Life expectancy ####
@@ -224,7 +225,7 @@ dashboard <- data_wdi |>
 
 dashboard <- dashboard[,c(8,6,7,4,5,2,14,13,1,3,11,10,9,12,15)]
 
-writexl::write_xlsx(dashboard, "dashboard_output_education.xlsx")
+writexl::write_xlsx(dashboard, "output/dashboard_output_education.xlsx")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Export to Excel ####

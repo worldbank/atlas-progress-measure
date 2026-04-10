@@ -18,15 +18,16 @@ library(collapse)
 library(readxl)
 library(dplyr)
 library(haven)
+setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
 
 ## !! NOTE: Add your own path ####
-meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/output/meta_sheet.csv") |>
+meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
                   "low")
   ) %>%
-  rename(indicator_select = indicator_wdi) 
+  rename(indicator_select = indicator_wdi)
 
 ## Make sure you have the latest version installed ####
 #devtools::install_github("RossanaTat/trackr")
@@ -38,15 +39,13 @@ setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-pro
 # Input data __________ #
 indicator_wdi <- "ELEC_SUP_PC"
 load("input/electricity.Rda")
-load("input/parameters.Rda")
 data_wdi <- electricity %>%
-  select(year, code, electricity)
-
+  select(-source)
 # Params from wdi metadata  ----- #
 # Change depending on which SDG, this example is SDG 2
 meta_indicator <- meta %>%
   filter(indicator == indicator_wdi)
-target         <- 10
+target         <- meta_indicator$target_value
 best           <- meta_indicator$best
 indicatorname  <- meta_indicator$indicatorname
 indicator_sdg  <- meta_indicator$indicator_sdg
@@ -66,14 +65,14 @@ progress_results <- trackr::track_progress(
   future         = TRUE,
   target_year    = 2030,
   speed          = TRUE,
-  percentiles    = FALSE,
+  percentiles    = TRUE,
   sequence_pctl  = seq(20, 80, 20),
   sequence_speed = c(0.25, 0.5, 1, 2, 4),
   best           = best,
   #  min            = meta_indicator$min,
   #  max            = meta_indicator$max,
   support        = meta_indicator$support,
-  granularity    = 0.01
+  granularity    = meta_indicator$granularity
 )
 
 

@@ -66,9 +66,9 @@ all_indicator_data <- rbind(indicators, extents_values_diffs) |>
   left_join(value_extents, by = "indicator_sdg") |>
   mutate(across(where(is.numeric), ~ ifelse(is.infinite(.), NA_real_, .)))
 
-meta <- read.csv('output/meta_sheet.csv') |>
+meta <- read.csv('input/meta_sheet.csv') |>
   select(-indicatorname, -indicatorshort, -unit) |>
-  mutate(indicator_360 = ifelse(!is.na(indicator_wdi), paste0('WB_WDI_', gsub("\\.", "_", indicator_wdi)), indicator_wdi))
+  mutate(indicator_360 = ifelse(!indicator_wdi == '', paste0('WB_WDI_', gsub("\\.", "_", indicator_wdi)), NA))
 
 # Add pillars mapping
 mapping <- read.csv("input/goals-pillars-mapping.csv")
@@ -80,6 +80,6 @@ reached.target <- left_join(prog, meta, by = "indicator_sdg") |>
 
 meta.extended <- left_join(meta, all_indicator_data, by = 'indicator_sdg') |>
   left_join(reached.target, by = 'indicator_sdg') |>
-  left_join(mapping, by = "sdg")
+  left_join(mapping, by = "indicator_sdg")
 
-write.csv(meta.extended, file = 'output/meta_extended_sheet.csv', row.names = FALSE)
+write.csv(meta.extended, file = 'output/meta_extended_sheet.csv', row.names = FALSE, na = '')

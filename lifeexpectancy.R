@@ -19,8 +19,9 @@ library(readxl)
 library(dplyr)
 library(haven)
 
+setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/")
 ## !! NOTE: Add your own path ####
-meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/output/meta_sheet.csv") |>
+meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
@@ -30,7 +31,6 @@ meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 202
 
 ## Make sure you have the latest version installed ####
 #devtools::install_github("RossanaTat/trackr")
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Life expectancy ####
@@ -164,7 +164,8 @@ dashboard_speed <- progress_results$scores$speed |>
          -time_start,
          -y_speed) |>
   merge(typical_value, by = "code") |>
-  rename("typical_end_value" = "y_speed")
+  rename("typical_end_value" = "y_speed") |>
+  select(-`.joyn`)
 
 # Merge all
 dashboard <- data_wdi |>
@@ -215,7 +216,7 @@ dashboard <- data_wdi |>
   rename("pctl"  = "score") |>
   mutate(pctl    = if_else(is.na(speed),
                            NA,
-                           pctl))
+                           pctl)) 
 
 
 dashboard <- dashboard[,c(8,6,7,4,5,2,14,13,1,3,11,10,9,12,15)]
