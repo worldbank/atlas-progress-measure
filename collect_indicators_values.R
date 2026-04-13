@@ -50,15 +50,15 @@ wdind <- c("SL.TLF.ACTI.FE.ZS",
 
 # Load and process data from WDI for SDG 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 17
 # Split into batches to avoid timeout
-batch1 <- wbstats::wb_data(indicator = wdind[1:4], country="countries_only")
-batch2 <- wbstats::wb_data(indicator = wdind[5:7], country="countries_only")
+batch1 <- wbstats::wb_data(indicator = wdind[1:3], country="countries_only")
+batch2 <- wbstats::wb_data(indicator = wdind[4:7], country="countries_only")
 
 batch1.long <- batch1 |>
   select(-iso2c, -country) |>
-  pivot_longer(cols = 3:6, names_to = 'variable', values_to = 'value')
+  pivot_longer(cols = 3:5, names_to = 'variable', values_to = 'value')
 batch2.long <- batch2 |>
   select(-iso2c, -country) |>
-  pivot_longer(cols = 3:5, names_to = 'variable', values_to = 'value')
+  pivot_longer(cols = 3:6, names_to = 'variable', values_to = 'value')
 
 values <- rbind(batch1.long, batch2.long)
 
@@ -80,7 +80,7 @@ eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
 
 # Water SDG 6
 # NO DATA IN REPO
-water <- read_excel("~/Downloads/JMP_2025_WLD.xlsx", 
+water <- read_excel("input/JMP_2025_WLD.xlsx", 
                     sheet = "wat") %>%
   select(iso3, year, wat_sm_t, wat_imp_prem_t, wat_imp_qual_t, wat_imp_av_t) %>%
   rename(iso3c = iso3,
