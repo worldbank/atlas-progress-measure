@@ -5,7 +5,7 @@ rm(list=ls())
 library(dplyr)
 library(quantregGrowth)
 library(readxl)
-#setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/")
+setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/")
 
 ### Full indicator list:
 ## From WDI (Atlas stories)
@@ -45,7 +45,7 @@ dashboard_final <- data.frame()
 indicators <- na.omit(meta$indicator_wdi)
 
 # Not working for "SL.TLF.ACTI.FE.ZS"
-wdind <- c("EG.ELC.ACCS.ZS", 
+wdind <- c("EG.ELC.ACCS.ZS", "SL.TLF.ACTI.FE.ZS",
            "IT.NET.USER.ZS", "IQ.SPI.OVRL", "SI.SPR.PGAP")
 
 ### SDG 5, 7, 9, 17
