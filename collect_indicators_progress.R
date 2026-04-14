@@ -72,7 +72,13 @@ sdg4 <- read_excel("intermediate/dashboard_output_SDG4.xlsx", sheet = 1) %>%
 lifexp <- read_excel("intermediate/dashboard_output_lifeexpectancy.xlsx", sheet = 1)
 gender <- read_excel("intermediate/dashboard_output_gender.xlsx", sheet = 1)
 ghggdp <- read_excel("intermediate/dashboard_output_ghggdp.xlsx", sheet = 1)
-sdg6 <- read_excel("intermediate/dashboard_output_water_components.xlsx", sheet = 1)
+sdg6 <- read_excel("intermediate/dashboard_output_water_components.xlsx", sheet = 1) |>
+  # All 3 subindicators are mapped to 6.1.1 in the data
+  mutate(indicator_sdg = case_when(
+    indicator_wdi == 'wat_imp_prem_t' ~ '61.1.0',
+    indicator_wdi == 'wat_imp_qual_t' ~ '61.2.0',
+    indicator_wdi == 'wat_imp_av_t' ~ '61.3.0',
+  ))
 electricity <- read_excel("intermediate/dashboard_output_electricity.xlsx", sheet = 1)
 
 dashboard14810 <- sdg1 |>
