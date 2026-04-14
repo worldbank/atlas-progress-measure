@@ -79,7 +79,6 @@ eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
   select(iso3c, date, variable, value)
 
 # Water SDG 6
-# NO DATA IN REPO
 water <- read_excel("input/JMP_2025_WLD.xlsx", 
                     sheet = "wat") %>%
   select(iso3, year, wat_sm_t, wat_imp_prem_t, wat_imp_qual_t, wat_imp_av_t) %>%
