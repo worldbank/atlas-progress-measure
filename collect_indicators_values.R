@@ -120,7 +120,7 @@ climate <- ghggdp %>%
 
 values <- values |>
   rbind(poverty) |>
-  #rbind(water) |>
+  rbind(water) |>
   rbind(eyrs) |>
   rbind(lifeexpectancy) |>
   rbind(gender) |>
