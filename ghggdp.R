@@ -20,7 +20,7 @@ library(dplyr)
 library(haven)
 
 ## !! NOTE: Add your own path ####
-meta <- read.csv("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/input/meta_sheet.csv") |>
+meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
     best = ifelse(more_is_better == 1,
                   "high",
@@ -164,8 +164,8 @@ dashboard_speed <- progress_results$scores$speed |>
          -time_start,
          -y_speed) |>
   merge(typical_value, by = "code") |>
-  rename("typical_end_value" = "y_speed") |>
-  select(-`.joyn`)
+  rename("typical_end_value" = "y_speed") #|>
+  #select(-`.joyn`)
 
 # Merge all
 dashboard <- data_wdi |>

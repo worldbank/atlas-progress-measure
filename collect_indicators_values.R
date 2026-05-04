@@ -78,6 +78,14 @@ eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
   mutate(variable = "HCI_EYRS") %>%
   select(iso3c, date, variable, value)
 
+#load("input/education.Rda")
+#eyrs <- education %>%
+#  rename(iso3c = code,
+#         value = education,
+#         date = year) %>%
+#  mutate(variable = "SCH_YRS") %>%
+#  select(iso3c, date, variable, value)
+
 # Water SDG 6
 water <- read_excel("input/JMP_2025_WLD.xlsx", 
                     sheet = "wat") %>%
