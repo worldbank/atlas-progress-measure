@@ -33,4 +33,3 @@ write_sheet(progress, ss = '14kDeXh0H6vjzldndSBN4p67CCNANHdm7EmqnwojcKh0', sheet
 
 meta.extended <- read.csv('output/meta_extended_sheet.csv')
 write_sheet(meta.extended, ss = '14kDeXh0H6vjzldndSBN4p67CCNANHdm7EmqnwojcKh0', sheet = 'meta_extended')
-
