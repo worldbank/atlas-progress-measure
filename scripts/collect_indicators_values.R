@@ -89,7 +89,7 @@ eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
 # Water SDG 6
 water <- read_excel("input/JMP_2025_WLD.xlsx", 
                     sheet = "wat") %>%
-  select(iso3, year, wat_sm_t, wat_imp_prem_t, wat_imp_qual_t, wat_imp_av_t) %>%
+  select(iso3, year, wat_imp_prem_t, wat_imp_qual_t, wat_imp_av_t) %>%
   rename(iso3c = iso3,
          date = year) %>%
   melt(id = c("iso3c", "date"))
