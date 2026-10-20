@@ -15,24 +15,31 @@ setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-pro
 # 4 Internet: IT.NET.USER.ZS
 # 5 SPI: IQ.SPI.OVRL
 
+# New
+# 6 SN.ITK.DEFC.ZS
+# 7 NY.GDP.PCAP.KD
+
 ## Direct downloads (Atlas stories)
-# 6 Education: HCI_EYRS
-# 7 Water: wat_imp_prem_t
-# 8 Water: wat_imp_qual_t
-# 9 Water: wat_imp_av_t
+# 8 Education: HCI_EYRS
+# 9 Water: wat_imp_prem_t
+# 10 Water: wat_imp_qual_t
+# 11 Water: wat_imp_av_t
 
 ## Direct downloads (Progress paper indicators)
-# 10 Poverty: SI.POV.DDAY
-# 11 Electricity: ELEC_SUP_PC
-# 12 Gender: WOMEN.INDEX
-# 13 Health: lifeexpectancy
-# 14 Climate: carbon_intensity
+# 12 Poverty: SI.POV.DDAY
+# 13 Electricity: ELEC_SUP_PC
+# 14 Gender: WOMEN.INDEX
+# 15 Health: lifeexpectancy
+# 16 Climate: carbon_intensity
 
 ## No progress indicators
 # Climate
 # Urban development
 # Overall progress
 # Artificial intelligence
+# ID ownership
+# Fossil fuel subsidies
+# Ocean plastic pollution
 
 meta <- read.csv("input/meta_sheet.csv") |>
   collapse::fmutate(
@@ -44,17 +51,17 @@ meta <- read.csv("input/meta_sheet.csv") |>
 dashboard_final <- data.frame()
 indicators <- na.omit(meta$indicator_wdi)
 
-# Not working for "SL.TLF.ACTI.FE.ZS"
 wdind <- c("EG.ELC.ACCS.ZS", "SL.TLF.ACTI.FE.ZS",
-           "IT.NET.USER.ZS", "IQ.SPI.OVRL", "SI.SPR.PGAP")
+           "IT.NET.USER.ZS", "IQ.SPI.OVRL", "SI.SPR.PGAP",
+           "SN.ITK.DEFC.ZS", "NY.GDP.PCAP.KD")
 
-### SDG 5, 7, 9, 17
+### SDG 2, 5, 7, 8, 9, 17
 for (indicator_wdi in wdind) {
   print(indicator_wdi)
   
   env <- new.env(parent = globalenv())
   env$indicator_wdi <- indicator_wdi
-  sys.source("calculate_indicator_progress.R", envir = env)   # run the script using this value
+  sys.source("scripts/calculate_indicator_progress.R", envir = env)   # run the script using this value
   
   df <- get("dashboard", envir = env)
 

@@ -18,24 +18,34 @@ library(reshape2)
 # 3 Electricity: EG.ELC.ACCS.ZS
 # 4 Internet: IT.NET.USER.ZS
 # 5 SPI: IQ.SPI.OVRL
+# 6 Urban: EN.POP.SLUM.UR.ZS
+# 7 Climate: EN.GHG.ALL.PC.CE.AR5
+
+# New
+# 8 SN.ITK.DEFC.ZS
+# 9 NY.GDP.PCAP.KD
 
 ## Direct downloads (Atlas stories)
-# 6 Education: HCI_EYRS
-# 7 Water: wat_imp_prem_t
-# 8 Water: wat_imp_qual_t
-# 9 Water: wat_imp_av_t
+# 10 Education: HCI_EYRS
+# 11 Water: wat_imp_prem_t
+# 12 Water: wat_imp_qual_t
+# 13 Water: wat_imp_av_t
+# 14 Artificial intelligence: GPT.USE
+
+# New
+# 12 ID ownership: ID_OWN
+# 13 Fossil fuel subsidies: FFSUBS
+# 14 Oceans: 
 
 ## Direct downloads (Progress paper indicators)
-# 10 Poverty: SI.POV.DDAY
-# 11 Electricity: ELEC_SUP_PC
-# 12 Gender: WOMEN.INDEX
-# 13 Health: lifeexpectancy
-# 14 Climate: carbon_intensity
+# 15 Poverty: SI.POV.DDAY
+# 16 Electricity: ELEC_SUP_PC
+# 17 Gender: WOMEN.INDEX
+# 18 Health: lifeexpectancy
+# 19 Climate: carbon_intensity
 
 ## No progress but needs value indicator
 # Climate
-# Urban development
-# Artificial intelligence
 
 ## No progress or values
 # Overall progress
@@ -46,16 +56,17 @@ meta <- read.csv("input/meta_sheet.csv")
 # Dashboard indicators list
 wdind <- c("SL.TLF.ACTI.FE.ZS", 
            "EG.ELC.ACCS.ZS",  "IT.NET.USER.ZS", "EN.POP.SLUM.UR.ZS",
-           "SI.SPR.PGAP", "EN.GHG.ALL.PC.CE.AR5",  "IQ.SPI.OVRL")
+           "SI.SPR.PGAP", "EN.GHG.ALL.PC.CE.AR5",  "IQ.SPI.OVRL",
+           "SN.ITK.DEFC.ZS", "NY.GDP.PCAP.KD")
 
 # Load and process data from WDI for SDG 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 17
 # Split into batches to avoid timeout
-batch1 <- wbstats::wb_data(indicator = wdind[1:3], country="countries_only")
-batch2 <- wbstats::wb_data(indicator = wdind[4:7], country="countries_only")
+batch1 <- wbstats::wb_data(indicator = wdind[1:5], country="countries_only")
+batch2 <- wbstats::wb_data(indicator = wdind[6:9], country="countries_only")
 
 batch1.long <- batch1 |>
   select(-iso2c, -country) |>
-  pivot_longer(cols = 3:5, names_to = 'variable', values_to = 'value')
+  pivot_longer(cols = 3:7, names_to = 'variable', values_to = 'value')
 batch2.long <- batch2 |>
   select(-iso2c, -country) |>
   pivot_longer(cols = 3:6, names_to = 'variable', values_to = 'value')
@@ -78,13 +89,37 @@ eyrs <- read_dta("input/EYS_data_update_2025 2.dta") %>%
   mutate(variable = "HCI_EYRS") %>%
   select(iso3c, date, variable, value)
 
-#load("input/education.Rda")
-#eyrs <- education %>%
-#  rename(iso3c = code,
-#         value = education,
-#         date = year) %>%
-#  mutate(variable = "SCH_YRS") %>%
-#  select(iso3c, date, variable, value)
+# Load and process data for ID ownership
+id <- read.csv("input/ID_OWN_WIDEF.csv") %>%
+  filter(SEX == "_T",
+         AGE == "_T",
+         URBANISATION == "_T",
+         COMP_BREAKDOWN_1 == "_T",
+         COMP_BREAKDOWN_2 == "_T",
+         COMP_BREAKDOWN_3 == "_T") %>%
+  select(REF_AREA, X2017, X2021, X2024) %>%
+  pivot_longer(cols = c(X2017, X2021, X2024), names_to = "date", values_to = "value") %>%
+  rename(iso3c = REF_AREA) %>%
+  mutate(variable = "ID_OWN",
+         date = as.numeric(gsub("X", "", date))) %>%
+  select(iso3c, date, variable, value)
+  
+# Load and process data for Fossil fuel subsidies
+subsidy <- read_excel("input/fossil_fuel_subsidies.xlsx", sheet = "fig3") %>%
+   rename(iso3c = `Country code`,
+          value = `Fossil fuel subsidy in 2024 ($ per capita)`) %>%
+   mutate(variable = "subsidy",
+          date = 2024) %>%
+   select(iso3c, date, variable, value)
+  
+# Load and process data for plastic pollution
+plastic <- read.csv("input/plastic-waste-pollution.csv") %>%
+  filter(Code != "") %>%
+  rename(iso3c = Code,
+        value = Plastic.pollution.per.capita..kg.,
+        date = Year) %>%
+   mutate(variable = "plastic") %>%
+   select(iso3c, date, variable, value)
 
 # Water SDG 6
 water <- read_excel("input/JMP_2025_WLD.xlsx", 
@@ -134,8 +169,11 @@ values <- values |>
   rbind(gender) |>
   rbind(electricity) |>
   rbind(climate) |>
-  rbind(ai)
-
+  rbind(ai) |>
+  rbind(subsidy) |>
+  rbind(plastic) |>
+  rbind(id)
+  
 values <- values |>
   merge(meta, by.x = "variable", 
                 by.y = "indicator", 
