@@ -5,7 +5,7 @@ rm(list=ls())
 library(dplyr)
 library(quantregGrowth)
 library(readxl)
-setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/")
+#setwd("/Users/dwadhwa/Library/CloudStorage/OneDrive-WBG/SDG Atlas 2025/atlas-progress-measure/")
 
 ### Full indicator list:
 ## From WDI (Atlas stories)
