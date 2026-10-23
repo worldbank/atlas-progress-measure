@@ -11,8 +11,8 @@ source("collect_indicators_aggregates.R")
 # This ones error:
 # source("prep/progress-electricity-supply.R")
 # source("prep/progress-sdg04-years-schooling.R")
-source("prep/progress-life-expectancy.R")
-source("prep/progress-women-empowerment-index.R")
+#source("prep/progress-life-expectancy.R")
+#source("prep/progress-women-empowerment-index.R")
 
 # Calculate progress for WDI indicators, collect all progress data
 source("collect_indicators_progress.R")
