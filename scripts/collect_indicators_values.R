@@ -105,11 +105,11 @@ id <- read.csv("input/ID_OWN_WIDEF.csv") %>%
   select(iso3c, date, variable, value)
   
 # Load and process data for Fossil fuel subsidies
-subsidy <- read_excel("input/fossil_fuel_subsidies.xlsx", sheet = "fig3") %>%
+subsidy <- read_excel("input/chp12_datasets_202608.xlsx", sheet = "ff_sub_time_series") %>%
    rename(iso3c = `Country code`,
-          value = `Fossil fuel subsidy in 2024 ($ per capita)`) %>%
-   mutate(variable = "subsidy",
-          date = 2024) %>%
+          value = `Fossil fuel subsidy ($ per capita)`,
+          date = Year) %>%
+   mutate(variable = "subsidy") %>%
    select(iso3c, date, variable, value)
   
 # Load and process data for plastic pollution
